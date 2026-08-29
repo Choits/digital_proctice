@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>데이터의 디지털 표현 · 연습실</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0A0E17;
+    --bg-grad: radial-gradient(circle at 15% 0%, #10192E 0%, #0A0E17 45%), radial-gradient(circle at 85% 100%, #0F1B24 0%, #0A0E17 55%);
+    --panel:#121A2B;
+    --panel-alt:#182238;
+    --border:#26314B;
+    --border-soft:#1C2540;
+    --text:#ECEFF6;
+    --muted:#8B93AD;
+    --amber:#F2B84C;
+    --amber-dim:rgba(242,184,76,.14);
+    --violet:#9B8CFF;
+    --violet-dim:rgba(155,140,255,.14);
+    --teal:#4FDCC4;
+    --teal-dim:rgba(79,220,196,.14);
+    --danger:#FF6B6B;
+    --danger-dim:rgba(255,107,107,.14);
+    --good:#4FDCC4;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg-grad);
+    background-color:var(--bg);
+    color:var(--text);
+    font-family:'IBM Plex Sans KR', sans-serif;
+    line-height:1.55;
+    padding-bottom:60px;
+    min-height:100vh;
+  }
+  .mono{font-family:'IBM Plex Mono', monospace;}
+  a{color:inherit;}
+
+  /* ---------- scoreboard ---------- */
+  .scoreboard{
+    position:fixed; top:14px; right:14px;
+    background:var(--panel); border:1px solid var(--border);
+    border-radius:999px; padding:8px 16px;
+    display:flex; align-items:center; gap:8px;
+    z-index:50; box-shadow:0 6px 20px rgba(0,0,0,.35);
+    font-size:13px;
+  }
+  .scoreboard #scoreText{color:var(--amber); font-weight:600; font-size:14px;}
+  .scoreboard .score-label{color:var(--muted);}
+
+  /* ---------- hero ---------- */
+  .hero{
+    max-width:920px; margin:0 auto; padding:56px 24px 28px;
+    text-align:center;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--muted); font-size:12px; margin-bottom:14px;
+  }
+  .hero h1{
+    font-size:clamp(26px, 4.4vw, 42px); margin:0 0 12px; font-weight:700; letter-spacing:-.01em;
+  }
+  .hero p{color:var(--muted); font-size:clamp(14px,2vw,16px); max-width:560px; margin:0 auto 28px;}
+
+  .hero-decode{
+    display:flex; flex-wrap:wrap; justify-content:center; gap:8px;
+    margin:0 auto 6px; max-width:640px;
+  }
+  .hero-byte{
+    background:var(--panel); border:1px solid var(--border);
+    border-radius:10px; padding:10px 12px;
+    font-size:15px; font-weight:600; color:var(--amber);
+    transition:opacity .3s ease, transform .3s ease;
+    min-width:58px; text-align:center;
+  }
+  .hero-byte.revealed{color:var(--teal); border-color:rgba(79,220,196,.4);}
+  .hero-caption{font-size:11.5px; color:var(--muted); margin-top:10px;}
+
+  /* ---------- tabs ---------- */
+  .tabs{
+    max-width:920px; margin:34px auto 0; padding:0 24px;
+    display:flex; gap:10px; justify-content:center; flex-wrap:wrap;
+  }
+  .tab-btn{
+    font-family:'IBM Plex Sans KR', sans-serif; font-size:14.5px; font-weight:600;
+    background:var(--panel); color:var(--muted); border:1px solid var(--border);
+    padding:11px 20px; border-radius:999px; cursor:pointer;
+    display:flex; align-items:center; gap:8px;
+    transition:all .18s ease;
+  }
+  .tab-btn .num{font-family:'IBM Plex Mono',monospace; font-size:11px; opacity:.7;}
+  .tab-btn:hover{border-color:var(--border-soft); color:var(--text);}
+  .tab-btn.active{color:var(--bg); border-color:transparent;}
+  .tab-btn[data-target="module-text"].active{background:var(--amber);}
+  .tab-btn[data-target="module-image"].active{background:var(--violet);}
+  .tab-btn[data-target="module-sound"].active{background:var(--teal);}
+
+  /* ---------- main / modules ---------- */
+  main{max-width:920px; margin:0 auto; padding:36px 24px 10px;}
+  .module{display:none;}
+  .module.active{display:block; animation:fadeIn .35s ease;}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+
+  .module-head h2{
+    font-size:clamp(20px,3vw,26px); margin:0 0 8px; display:flex; align-items:center; gap:10px;
+  }
+  .module-head .tag{
+    font-size:12px; padding:3px 9px; border-radius:6px; border:1px solid var(--border);
+    color:var(--muted); font-weight:600;
+  }
+  .module-head p{color:var(--muted); margin:0 0 22px; font-size:14.5px; max-width:680px;}
+  .module-head p b{color:var(--text);}
+
+  details.ref-table{
+    background:var(--panel); border:1px solid var(--border); border-radius:var(--radius);
+    padding:14px 18px; margin-bottom:24px;
+  }
+  details.ref-table summary{cursor:pointer; font-weight:600; font-size:14px; color:var(--amber); outline:none;}
+  #asciiTable{border-collapse:collapse; margin-top:14px; width:100%; font-size:12.5px;}
+  #asciiTable th, #asciiTable td{
+    border:1px solid var(--border-soft); text-align:center; padding:5px 4px;
+    font-family:'IBM Plex Mono', monospace; color:var(--text); min-width:26px;
+  }
+  #asciiTable th{color:var(--amber); background:var(--panel-alt); font-weight:600;}
+  #asciiTable td{color:var(--muted);}
+
+  .practice-grid{display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:18px;}
+  @media (max-width:720px){.practice-grid{grid-template-columns:1fr;}}
+
+  .card{
+    background:var(--panel); border:1px solid var(--border); border-radius:var(--radius);
+    padding:22px;
+  }
+  .card.wide{margin-bottom:18px;}
+  .card-label{font-size:13px; color:var(--muted); font-weight:600; margin-bottom:14px; letter-spacing:.02em;}
+
+  .prompt-big{
+    font-size:38px; font-weight:700; text-align:center; padding:20px 0; color:var(--text);
+    background:var(--panel-alt); border-radius:12px; margin-bottom:16px; letter-spacing:.04em;
+  }
+  .answer-row{display:flex; gap:10px; flex-wrap:wrap;}
+  input[type="text"], input[type="number"], .answer-row input{
+    flex:1; min-width:110px;
+    background:var(--bg); border:1px solid var(--border); color:var(--text);
+    border-radius:10px; padding:11px 13px; font-size:15px; font-family:'IBM Plex Mono', monospace;
+    outline:none; transition:border-color .15s ease;
+  }
+  .answer-row input:focus{border-color:var(--amber);}
+  button{
+    font-family:'IBM Plex Sans KR', sans-serif; font-weight:600; font-size:14px;
+    background:var(--amber); color:#20160A; border:none; border-radius:10px;
+    padding:11px 18px; cursor:pointer; transition:transform .12s ease, opacity .12s ease;
+  }
+  button:hover{transform:translateY(-1px);}
+  button:active{transform:translateY(0);}
+  button.ghost{
+    background:transparent; color:var(--muted); border:1px solid var(--border);
+    margin-top:12px; width:100%;
+  }
+  button.ghost:hover{color:var(--text); border-color:var(--border-soft);}
+
+  .feedback{min-height:20px; margin-top:12px; font-size:13.5px; font-weight:600;}
+  .feedback.good{color:var(--good);}
+  .feedback.bad{color:var(--danger);}
+
+  .toggle{display:flex; align-items:center; gap:8px; color:var(--muted); font-size:13.5px; margin:6px 0 26px; cursor:pointer;}
+  .toggle input{accent-color:var(--amber);}
+
+  .bincode-row{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:18px;}
+  .bin-chunk{
+    background:var(--panel-alt); border:1px solid var(--border-soft); border-radius:9px;
+    padding:9px 11px; font-size:14px; color:var(--amber); font-weight:600;
+  }
+
+  /* module 2 specific */
+  .mode-select{display:flex; gap:10px; margin-bottom:22px;}
+  .mode-btn{
+    flex:1; background:var(--panel); border:1px solid var(--border); color:var(--muted);
+    padding:12px; border-radius:12px; font-weight:600; cursor:pointer; font-size:14px;
+  }
+  .mode-btn.active{background:var(--violet-dim); border-color:var(--violet); color:var(--violet);}
+
+  .image-practice-grid{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+  @media (max-width:760px){.image-practice-grid{grid-template-columns:1fr;}}
+
+  .pixel-stage{
+    background:#FFFFFF; border-radius:12px; padding:10px; display:flex; justify-content:center; margin-bottom:16px;
+  }
+  #pixelCanvas{border-radius:6px; display:block; max-width:100%; height:auto;}
+
+  .qfield{display:flex; align-items:center; gap:10px; margin-bottom:10px;}
+  .qfield label{flex:1; font-size:13.5px; color:var(--muted);}
+  .qfield input{width:90px; flex:none;}
+  .qmark{font-size:12px; font-weight:700; min-width:130px;}
+  .qmark.ok{color:var(--good);}
+  .qmark.no{color:var(--danger);}
+  input.ok{border-color:var(--good) !important;}
+  input.no{border-color:var(--danger) !important;}
+
+  .bit-row{font-size:13px; color:var(--violet); margin-bottom:4px; letter-spacing:.03em;}
+  .draw-grid{display:grid; gap:5px; margin:16px 0;}
+  .draw-cell{
+    aspect-ratio:1; border-radius:6px; border:1px solid var(--border-soft); padding:0; cursor:pointer;
+    background:#fff; transition:box-shadow .12s ease;
+  }
+  .draw-cell:hover{box-shadow:0 0 0 2px var(--violet);}
+  .draw-cell.wrong{box-shadow:0 0 0 2px var(--danger);}
+
+  /* module 3 specific */
+  .flow-diagram{
+    display:flex; align-items:stretch; gap:10px; margin-bottom:24px; flex-wrap:wrap;
+  }
+  .flow-step{
+    flex:1; min-width:150px; background:var(--panel); border:1px solid var(--border); border-radius:12px;
+    padding:16px; text-align:center;
+  }
+  .flow-step b{display:block; color:var(--teal); font-size:15px; margin-bottom:6px;}
+  .flow-step span{font-size:12.5px; color:var(--muted);}
+  .flow-arrow{display:flex; align-items:center; color:var(--border-soft); font-size:20px;}
+  @media (max-width:640px){.flow-arrow{display:none;}}
+
+  .bit-select-row{display:flex; align-items:center; gap:10px; margin-bottom:16px; font-size:13.5px; color:var(--muted);}
+  select{
+    background:var(--bg); border:1px solid var(--border); color:var(--text);
+    border-radius:8px; padding:8px 10px; font-family:'IBM Plex Mono', monospace; font-size:13px;
+  }
+
+  #waveCanvas{width:100%; height:auto; display:block; border-radius:10px; background:var(--panel-alt); margin-bottom:18px;}
+
+  .sample-inputs{display:flex; flex-wrap:wrap; gap:10px; margin-bottom:16px;}
+  .sample-col{
+    background:var(--panel-alt); border:1px solid var(--border-soft); border-radius:10px;
+    padding:12px; flex:1; min-width:104px; text-align:center;
+  }
+  .sample-col .sx{font-size:12px; color:var(--muted); margin-bottom:6px;}
+  .sample-col .sraw{font-family:'IBM Plex Mono',monospace; font-size:15px; color:var(--amber); margin-bottom:10px;}
+  .sample-col label{display:block; font-size:10.5px; color:var(--muted); margin:6px 0 3px; text-align:left;}
+  .sample-col input{width:100%; padding:8px 9px; font-size:13px;}
+  .sample-col input[readonly]{background:var(--panel); color:var(--teal); cursor:default;}
+
+  /* footer summary */
+  .summary{
+    max-width:920px; margin:44px auto 0; padding:0 24px;
+  }
+  .summary-card{
+    background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:24px;
+  }
+  .summary-card h3{margin:0 0 14px; font-size:16px;}
+  .summary-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:16px;}
+  @media (max-width:720px){.summary-grid{grid-template-columns:1fr;}}
+  .summary-item{border-left:3px solid var(--border-soft); padding-left:12px;}
+  .summary-item.t1{border-color:var(--amber);}
+  .summary-item.t2{border-color:var(--violet);}
+  .summary-item.t3{border-color:var(--teal);}
+  .summary-item h4{margin:0 0 6px; font-size:13.5px;}
+  .summary-item p{margin:0; font-size:12.5px; color:var(--muted); font-family:'IBM Plex Mono', monospace; line-height:1.6;}
+</style>
+</head>
+<body>
+
+  <div class="scoreboard"><span id="scoreText">0 / 0</span><span class="score-label">정답</span></div>
+
+  <header class="hero">
+    <div class="eyebrow">Ⅱ-1-02 · 데이터의 디지털 표현</div>
+    <h1>0과 1로 세상을 표현해보기</h1>
+    <p>문자, 이미지, 소리를 컴퓨터가 이해하는 이진수로 바꾸는 연습을 해봐요.</p>
+    <div class="hero-decode mono" id="heroDecode"></div>
+    <div class="hero-caption">7비트 아스키 코드로 숨겨진 단어가 해독되는 걸 지켜보세요</div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab-btn active" data-target="module-text"><span class="num">01</span>문자</button>
+    <button class="tab-btn" data-target="module-image"><span class="num">02</span>이미지</button>
+    <button class="tab-btn" data-target="module-sound"><span class="num">03</span>소리</button>
+  </nav>
+
+  <main>
+
+    <!-- ===================== MODULE 1 : TEXT ===================== -->
+    <section id="module-text" class="module active">
+      <div class="module-head">
+        <h2><span class="tag">01</span> 문자의 디지털 표현</h2>
+        <p>컴퓨터는 문자 하나하나를 <b>아스키(ASCII) 코드</b>라는 약속에 따라 <b>7자리 이진수</b>로 바꿔서 저장해요.</p>
+      </div>
+
+      <details class="ref-table">
+        <summary>아스키 코드표 보기 (상위 3비트 × 하위 4비트)</summary>
+        <table id="asciiTable"></table>
+      </details>
+
+      <div class="practice-grid">
+        <div class="card">
+          <div class="card-label">문자 → 이진수</div>
+          <div class="prompt-big mono" id="t2bChar">A</div>
+          <div class="answer-row">
+            <input type="text" id="t2bInput" class="mono" maxlength="7" placeholder="0000000">
+            <button onclick="checkT2B()">확인</button>
+          </div>
+          <div class="feedback" id="t2bFeedback"></div>
+          <button class="ghost" onclick="nextT2B()">다음 문제 →</button>
+        </div>
+
+        <div class="card">
+          <div class="card-label">이진수 → 문자 <span style="opacity:.6">(공백이면 빈 칸으로 확인)</span></div>
+          <div class="prompt-big mono" id="b2tBin">1000001</div>
+          <div class="answer-row">
+            <input type="text" id="b2tInput" class="mono" maxlength="1" placeholder="A">
+            <button onclick="checkB2T()">확인</button>
+          </div>
+          <div class="feedback" id="b2tFeedback"></div>
+          <button class="ghost" onclick="nextB2T()">다음 문제 →</button>
+        </div>
+      </div>
+
+      <label class="toggle"><input type="checkbox" id="easyModeToggle" checked> 영문자 · 숫자 · 공백만 출제하기</label>
+
+      <div class="card wide">
+        <div class="card-label">암호 해독 — 이진수로 숨겨진 단어를 찾아보세요</div>
+        <div class="bincode-row mono" id="decodeBinRow"></div>
+        <div class="answer-row">
+          <input type="text" id="decodeInput" class="mono" placeholder="정답 단어 입력" style="text-transform:uppercase">
+          <button onclick="checkDecode()">확인</button>
+        </div>
+        <div class="feedback" id="decodeFeedback"></div>
+        <button class="ghost" onclick="nextDecode()">다른 단어 →</button>
+      </div>
+    </section>
+
+    <!-- ===================== MODULE 2 : IMAGE ===================== -->
+    <section id="module-image" class="module">
+      <div class="module-head">
+        <h2><span class="tag">02</span> 이미지의 디지털 표현</h2>
+        <p>이미지는 작은 점(<b>픽셀</b>)들의 모음이에요. 픽셀 하나를 표현하는 데 쓰는 <b>비트 수</b>가 늘어날수록 더 많은 색을 표현할 수 있어요.</p>
+      </div>
+
+      <div class="mode-select">
+        <button class="mode-btn active" data-mode="1">흑백모드 · 1비트 (2가지 색)</button>
+        <button class="mode-btn" data-mode="2">컬러모드 · 2비트 (4가지 색)</button>
+      </div>
+
+      <div class="image-practice-grid">
+        <div class="card">
+          <div class="card-label">이미지를 보고 정보를 계산해보세요</div>
+          <div class="pixel-stage"><canvas id="pixelCanvas" width="280" height="280"></canvas></div>
+          <div id="imgQuizFields"></div>
+          <button onclick="checkImageQuiz()" style="width:100%;">채점하기</button>
+          <div class="feedback" id="imgQuizFeedback"></div>
+          <button class="ghost" onclick="nextImagePuzzle()">다음 이미지 →</button>
+        </div>
+
+        <div class="card">
+          <div class="card-label">이진수를 보고 이미지를 그려보세요 (클릭해서 색 바꾸기)</div>
+          <div id="drawTargetBits" class="mono" style="margin-bottom:12px;"></div>
+          <div class="pixel-stage"><div id="drawGrid" class="draw-grid" style="width:100%;"></div></div>
+          <button onclick="checkDrawGrid()" style="width:100%;">채점하기</button>
+          <div class="feedback" id="drawFeedback"></div>
+          <button class="ghost" onclick="nextDrawPuzzle()">다른 문제 →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== MODULE 3 : SOUND ===================== -->
+    <section id="module-sound" class="module">
+      <div class="module-head">
+        <h2><span class="tag">03</span> 소리의 디지털 표현</h2>
+        <p>아날로그 소리는 <b>표본화 → 양자화 → 부호화</b> 세 단계를 거쳐 디지털 신호(이진수)로 바뀌어요.</p>
+      </div>
+
+      <div class="flow-diagram">
+        <div class="flow-step"><b>① 표본화</b><span>일정한 시간 간격으로 소리 값을 추출해요</span></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><b>② 양자화</b><span>추출한 값을 가장 가까운 정수 단계로 반올림해요</span></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><b>③ 부호화</b><span>정수 단계를 이진수로 바꿔 저장해요</span></div>
+      </div>
+
+      <div class="bit-select-row">
+        부호화 비트 수:
+        <select id="bitSelect">
+          <option value="2">2비트 (0~3단계)</option>
+          <option value="3" selected>3비트 (0~7단계)</option>
+        </select>
+      </div>
+
+      <div class="card wide">
+        <div class="card-label">파형에서 추출한 값을 양자화하고 이진수로 부호화 해보세요</div>
+        <canvas id="waveCanvas" width="720" height="300"></canvas>
+        <div class="sample-inputs" id="sampleInputs"></div>
+        <button onclick="checkSoundQuiz()" style="width:100%;">채점하기</button>
+        <div class="feedback" id="soundFeedback"></div>
+        <button class="ghost" onclick="nextSoundPuzzle()">다른 파형 →</button>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="summary">
+    <div class="summary-card">
+      <h3>핵심 정리</h3>
+      <div class="summary-grid">
+        <div class="summary-item t1">
+          <h4>문자</h4>
+          <p>문자 1개 = 7비트<br>(아스키 코드)</p>
+        </div>
+        <div class="summary-item t2">
+          <h4>이미지</h4>
+          <p>색상 수 = 2ⁿ (n=픽셀당 비트)<br>용량(비트) = 가로×세로×n</p>
+        </div>
+        <div class="summary-item t3">
+          <h4>소리</h4>
+          <p>표본화 → 양자화 → 부호화<br>n비트 부호화 = 2ⁿ단계</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* ============ helpers ============ */
+function $(id){return document.getElementById(id);}
+function randInt(min,max){return Math.floor(Math.random()*(max-min+1))+min;}
+function clamp(v,min,max){return Math.max(min,Math.min(max,v));}
+
+let totalCorrect=0, totalAttempts=0;
+function recordAnswer(correct){
+  totalAttempts++;
+  if(correct) totalCorrect++;
+  $('scoreText').textContent = totalCorrect+' / '+totalAttempts;
+}
+function showFeedback(elId, correct, msg){
+  const el=$(elId);
+  el.textContent = (correct? '정답이에요! 🎉 ':'아쉬워요. ') + (msg||'');
+  el.className = 'feedback ' + (correct?'good':'bad');
+}
+
+/* ============ tabs ============ */
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.module').forEach(m=>m.classList.remove('active'));
+    btn.classList.add('active');
+    $(btn.dataset.target).classList.add('active');
+  });
+});
+
+/* ============ hero decode animation ============ */
+const HERO_WORD = "SMILE";
+function buildHeroDecode(){
+  const el = $('heroDecode');
+  el.innerHTML='';
+  HERO_WORD.split('').forEach(ch=>{
+    const span=document.createElement('span');
+    span.className='hero-byte mono';
+    span.dataset.bin = ch.charCodeAt(0).toString(2).padStart(7,'0');
+    span.dataset.char = ch;
+    span.textContent = span.dataset.bin;
+    el.appendChild(span);
+  });
+}
+function animateHeroDecode(){
+  const spans = document.querySelectorAll('.hero-byte');
+  spans.forEach(s=>{ s.textContent=s.dataset.bin; s.classList.remove('revealed'); });
+  spans.forEach((s,i)=>{
+    setTimeout(()=>{
+      s.style.opacity=0;
+      setTimeout(()=>{ s.textContent=s.dataset.char; s.classList.add('revealed'); s.style.opacity=1; }, 260);
+    }, i*480+400);
+  });
+}
+buildHeroDecode();
+animateHeroDecode();
+setInterval(animateHeroDecode, HERO_WORD.length*480+3600);
+
+/* ============ MODULE 1 : TEXT ============ */
+const EASY_POOL = [...Array(26).keys()].map(i=>65+i)
+  .concat([...Array(10).keys()].map(i=>48+i))
+  .concat([32]);
+const FULL_POOL = [...Array(95).keys()].map(i=>32+i);
+
+function buildAsciiTable(){
+  let html='<tr><th></th>';
+  for(let col=0; col<8; col++) html+=`<th>${col.toString(2).padStart(3,'0')}</th>`;
+  html+='</tr>';
+  for(let row=0; row<16; row++){
+    html+=`<tr><th>${row.toString(2).padStart(4,'0')}</th>`;
+    for(let col=0; col<8; col++){
+      const code = col*16+row;
+      let label;
+      if(code===32) label='␣';
+      else if(code===127) label='DEL';
+      else if(code<32) label='–';
+      else label=String.fromCharCode(code);
+      html+=`<td>${label}</td>`;
+    }
+    html+='</tr>';
+  }
+  $('asciiTable').innerHTML = html;
+}
+
+function poolChars(){ return $('easyModeToggle').checked ? EASY_POOL : FULL_POOL; }
+function randChar(){ const p=poolChars(); return p[randInt(0,p.length-1)]; }
+
+let t2bCode;
+function nextT2B(){
+  t2bCode = randChar();
+  const ch = String.fromCharCode(t2bCode);
+  $('t2bChar').textContent = ch===' ' ? '␣ (공백)' : ch;
+  $('t2bInput').value='';
+  $('t2bFeedback').textContent='';
+  $('t2bFeedback').className='feedback';
+}
+function checkT2B(){
+  const val = $('t2bInput').value.trim();
+  const answer = t2bCode.toString(2).padStart(7,'0');
+  const correct = val===answer;
+  showFeedback('t2bFeedback', correct, correct?'':('정답: '+answer));
+  recordAnswer(correct);
+}
+
+let b2tCode;
+function nextB2T(){
+  b2tCode = randChar();
+  $('b2tBin').textContent = b2tCode.toString(2).padStart(7,'0');
+  $('b2tInput').value='';
+  $('b2tFeedback').textContent='';
+  $('b2tFeedback').className='feedback';
+}
+function checkB2T(){
+  const val = $('b2tInput').value;
+  const expected = String.fromCharCode(b2tCode);
+  let correct;
+  if(expected===' ') correct = (val==='' || val===' ');
+  else correct = (val===expected);
+  showFeedback('b2tFeedback', correct, correct?'':('정답: "'+(expected===' '?'␣(공백)':expected)+'"'));
+  recordAnswer(correct);
+}
+
+const WORDS = ["CODE","DATA","PIXEL","SOUND","LOGIC","ROBOT","MOUSE","CLOUD","LASER","MEDIA","BINARY","SIGNAL","HAPPY","MUSIC","BYTE"];
+let decodeWord=null, decodeLast=null;
+function nextDecode(){
+  let w;
+  do{ w = WORDS[randInt(0,WORDS.length-1)]; } while(w===decodeLast && WORDS.length>1);
+  decodeLast=w; decodeWord=w;
+  const row=$('decodeBinRow'); row.innerHTML='';
+  w.split('').forEach(ch=>{
+    const span=document.createElement('span');
+    span.className='bin-chunk';
+    span.textContent = ch.charCodeAt(0).toString(2).padStart(7,'0');
+    row.appendChild(span);
+  });
+  $('decodeInput').value='';
+  $('decodeFeedback').textContent='';
+  $('decodeFeedback').className='feedback';
+}
+function checkDecode(){
+  const val = $('decodeInput').value.trim().toUpperCase();
+  const correct = val===decodeWord;
+  showFeedback('decodeFeedback', correct, correct?'':('정답: '+decodeWord));
+  recordAnswer(correct);
+}
+
+/* ============ MODULE 2 : IMAGE ============ */
+let currentBitDepth = 1;
+document.querySelectorAll('.mode-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    currentBitDepth = parseInt(btn.dataset.mode,10);
+    nextImagePuzzle();
+    nextDrawPuzzle();
+  });
+});
+
+function paletteColor(bitDepth, value){
+  if(bitDepth===1) return value===0 ? '#FFFFFF' : '#12151B';
+  const map=['#FFFFFF','#E5484D','#3B82F6','#F5C542'];
+  return map[value];
+}
+
+let imgGrid, imgRows, imgCols, imgBpp;
+function nextImagePuzzle(){
+  imgRows = randInt(3,5); imgCols = randInt(3,5);
+  imgBpp = currentBitDepth;
+  const maxVal = imgBpp===1?1:3;
+  imgGrid = Array.from({length:imgRows*imgCols}, ()=>randInt(0,maxVal));
+  drawPixelCanvas('pixelCanvas', imgGrid, imgRows, imgCols, imgBpp);
+  $('imgQuizFields').innerHTML =
+    `<div class="qfield"><label>① 픽셀 하나를 표현하는 비트 수</label><input type="number" id="qBpp"><span class="qmark" id="qBppMark"></span></div>
+     <div class="qfield"><label>② 표현 가능한 색의 수</label><input type="number" id="qColors"><span class="qmark" id="qColorsMark"></span></div>
+     <div class="qfield"><label>③ 전체 픽셀 수 (가로×세로)</label><input type="number" id="qPixels"><span class="qmark" id="qPixelsMark"></span></div>
+     <div class="qfield"><label>④ 전체 저장 용량 (비트)</label><input type="number" id="qCapacity"><span class="qmark" id="qCapacityMark"></span></div>`;
+  $('imgQuizFeedback').textContent='';
+  $('imgQuizFeedback').className='feedback';
+}
+
+function drawPixelCanvas(canvasId, grid, rows, cols, bpp){
+  const canvas=$(canvasId);
+  const ctx=canvas.getContext('2d');
+  const w=canvas.width, h=canvas.height;
+  ctx.clearRect(0,0,w,h);
+  const cw=w/cols, ch=h/rows;
+  for(let r=0;r<rows;r++){
+    for(let c=0;c<cols;c++){
+      const v=grid[r*cols+c];
+      ctx.fillStyle=paletteColor(bpp,v);
+      ctx.fillRect(c*cw, r*ch, cw, ch);
+      ctx.strokeStyle='rgba(0,0,0,0.15)';
+      ctx.strokeRect(c*cw, r*ch, cw, ch);
+    }
+  }
+}
+
+function checkImageQuiz(){
+  const bpp=parseInt($('qBpp').value,10);
+  const colors=parseInt($('qColors').value,10);
+  const pixels=parseInt($('qPixels').value,10);
+  const capacity=parseInt($('qCapacity').value,10);
+
+  const cBpp=imgBpp, cColors=Math.pow(2,imgBpp), cPixels=imgRows*imgCols, cCapacity=cPixels*imgBpp;
+  const checks=[
+    ['qBpp','qBppMark', bpp===cBpp, cBpp],
+    ['qColors','qColorsMark', colors===cColors, cColors],
+    ['qPixels','qPixelsMark', pixels===cPixels, cPixels],
+    ['qCapacity','qCapacityMark', capacity===cCapacity, cCapacity],
+  ];
+  let allCorrect=true;
+  checks.forEach(([inputId,markId,ok,answer])=>{
+    $(inputId).classList.toggle('ok',ok);
+    $(inputId).classList.toggle('no',!ok);
+    $(markId).textContent = ok? '✓' : ('✕ 정답 '+answer);
+    $(markId).className = 'qmark '+(ok?'ok':'no');
+    if(!ok) allCorrect=false;
+    recordAnswer(ok);
+  });
+  showFeedback('imgQuizFeedback', allCorrect, allCorrect?'':'빨간 항목의 정답을 확인해보세요.');
+}
+
+let drawGridData, drawRows, drawCols, drawBpp, studentDrawGrid;
+function nextDrawPuzzle(){
+  drawRows=randInt(3,4); drawCols=randInt(3,4);
+  drawBpp=currentBitDepth;
+  const maxVal=drawBpp===1?1:3;
+  drawGridData = Array.from({length:drawRows*drawCols}, ()=>randInt(0,maxVal));
+  studentDrawGrid = Array(drawRows*drawCols).fill(0);
+  renderTargetBits();
+  renderDrawGrid();
+  $('drawFeedback').textContent='';
+  $('drawFeedback').className='feedback';
+}
+function renderTargetBits(){
+  const el=$('drawTargetBits'); el.innerHTML='';
+  for(let r=0;r<drawRows;r++){
+    const rowDiv=document.createElement('div');
+    rowDiv.className='bit-row';
+    const parts=[];
+    for(let c=0;c<drawCols;c++){
+      const v=drawGridData[r*drawCols+c];
+      parts.push(drawBpp===1 ? String(v) : v.toString(2).padStart(2,'0'));
+    }
+    rowDiv.textContent = '행'+(r+1)+' :  '+parts.join('   ');
+    el.appendChild(rowDiv);
+  }
+}
+function renderDrawGrid(){
+  const grid=$('drawGrid');
+  grid.innerHTML='';
+  grid.style.gridTemplateColumns = `repeat(${drawCols}, 1fr)`;
+  const maxVal = drawBpp===1?1:3;
+  for(let i=0;i<drawRows*drawCols;i++){
+    const cell=document.createElement('button');
+    cell.type='button';
+    cell.className='draw-cell';
+    cell.style.background = paletteColor(drawBpp, studentDrawGrid[i]);
+    cell.addEventListener('click', ()=>{
+      studentDrawGrid[i] = (studentDrawGrid[i]+1) % (maxVal+1);
+      cell.style.background = paletteColor(drawBpp, studentDrawGrid[i]);
+      cell.classList.remove('wrong');
+    });
+    grid.appendChild(cell);
+  }
+}
+function checkDrawGrid(){
+  const cells=document.querySelectorAll('#drawGrid .draw-cell');
+  let allCorrect=true;
+  cells.forEach((cell,i)=>{
+    const ok = studentDrawGrid[i]===drawGridData[i];
+    cell.classList.toggle('wrong', !ok);
+    if(!ok) allCorrect=false;
+  });
+  showFeedback('drawFeedback', allCorrect, allCorrect?'':'빨간 테두리 칸을 목표 이진수와 다시 비교해보세요.');
+  recordAnswer(allCorrect);
+}
+
+/* ============ MODULE 3 : SOUND ============ */
+let soundBits=3, soundMaxLevel=7;
+const soundN=5;
+let soundSamples=[], waveFn;
+
+$('bitSelect').addEventListener('change', e=>{
+  soundBits=parseInt(e.target.value,10);
+  soundMaxLevel=Math.pow(2,soundBits)-1;
+  nextSoundPuzzle();
+});
+
+function makeWave(maxLevel){
+  const freq=0.35+Math.random()*0.4;
+  const phase=Math.random()*Math.PI*2;
+  const freq2=freq*1.8+0.15;
+  const amp2=0.3+Math.random()*0.3;
+  return function(x){
+    const v = Math.sin(x*freq+phase) + amp2*Math.sin(x*freq2+phase*1.4);
+    const norm = (v + (1+amp2)) / ((1+amp2)*2);
+    return norm*maxLevel;
+  };
+}
+
+function nextSoundPuzzle(){
+  waveFn = makeWave(soundMaxLevel);
+  soundSamples=[];
+  for(let x=0;x<soundN;x++){
+    const raw = clamp(waveFn(x),0,soundMaxLevel);
+    const quant = Math.round(raw);
+    const bin = quant.toString(2).padStart(soundBits,'0');
+    soundSamples.push({x, raw: Math.round(raw*10)/10, quant, bin});
+  }
+  drawWaveCanvas();
+  renderSampleInputs();
+  $('soundFeedback').textContent='';
+  $('soundFeedback').className='feedback';
+}
+
+function drawWaveCanvas(){
+  const canvas=$('waveCanvas');
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width, H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+  const padL=42, padR=20, padT=24, padB=38;
+  const plotW=W-padL-padR, plotH=H-padT-padB;
+  const xToPx = x => padL + (x/(soundN-1))*plotW;
+  const yToPx = y => padT + (1-(y/soundMaxLevel))*plotH;
+
+  ctx.strokeStyle='rgba(255,255,255,0.08)'; ctx.lineWidth=1;
+  ctx.font='11px "IBM Plex Mono", monospace';
+  for(let lvl=0; lvl<=soundMaxLevel; lvl++){
+    const py=yToPx(lvl);
+    ctx.beginPath(); ctx.moveTo(padL,py); ctx.lineTo(W-padR,py); ctx.stroke();
+    ctx.fillStyle='#8B93AD'; ctx.textAlign='right';
+    ctx.fillText(String(lvl), padL-8, py+3);
+  }
+  ctx.textAlign='center';
+  for(let x=0;x<soundN;x++){
+    ctx.fillStyle='#8B93AD';
+    ctx.fillText(String(x), xToPx(x), H-padB+18);
+  }
+
+  ctx.strokeStyle='#4FDCC4'; ctx.lineWidth=2.5; ctx.beginPath();
+  const steps=220;
+  for(let i=0;i<=steps;i++){
+    const x=(i/steps)*(soundN-1);
+    const y=clamp(waveFn(x),0,soundMaxLevel);
+    const px=xToPx(x), py=yToPx(y);
+    if(i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+  }
+  ctx.stroke();
+
+  soundSamples.forEach(s=>{
+    const px=xToPx(s.x), py=yToPx(s.raw);
+    ctx.fillStyle='#F2B84C';
+    ctx.beginPath(); ctx.arc(px,py,5,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#ECEFF6'; ctx.textAlign='center';
+    ctx.fillText(s.raw.toFixed(1), px, py-12);
+  });
+
+  ctx.fillStyle='#8B93AD'; ctx.font='11px "IBM Plex Sans KR", sans-serif';
+  ctx.textAlign='right'; ctx.fillText('시간(x)', W-padR, H-6);
+}
+
+function renderSampleInputs(){
+  const wrap=$('sampleInputs');
+  wrap.innerHTML='';
+  soundSamples.forEach(s=>{
+    const col=document.createElement('div');
+    col.className='sample-col';
+    col.innerHTML = `
+      <div class="sx">x = ${s.x}</div>
+      <div class="sraw mono">y ≈ ${s.raw.toFixed(1)}</div>
+      <label>양자화 값</label>
+      <input type="number" id="q_${s.x}" class="mono" min="0" max="${soundMaxLevel}">
+      <label>이진 부호 (자동 변환)</label>
+      <input type="text" id="b_${s.x}" class="mono" maxlength="${soundBits}" placeholder="${'0'.repeat(soundBits)}" readonly>
+    `;
+    wrap.appendChild(col);
+    bindQuantAutoBinary(s);
+  });
+}
+
+function bindQuantAutoBinary(sample){
+  const qEl=$('q_'+sample.x), bEl=$('b_'+sample.x);
+  qEl.addEventListener('input', ()=>{
+    qEl.classList.remove('ok','no');
+    bEl.classList.remove('ok','no');
+    const raw=qEl.value.trim();
+    if(raw===''){ bEl.value=''; return; }
+    let n=parseInt(raw,10);
+    if(isNaN(n)){ bEl.value=''; return; }
+    n=clamp(n,0,soundMaxLevel);
+    bEl.value = n.toString(2).padStart(soundBits,'0');
+  });
+}
+
+function checkSoundQuiz(){
+  let allCorrect=true;
+  soundSamples.forEach(s=>{
+    const qEl=$('q_'+s.x), bEl=$('b_'+s.x);
+    const qOk = parseInt(qEl.value,10)===s.quant;
+    qEl.classList.toggle('ok',qOk); qEl.classList.toggle('no',!qOk);
+    bEl.classList.toggle('ok',qOk); bEl.classList.toggle('no',!qOk);
+    if(!qOk) allCorrect=false;
+    recordAnswer(qOk);
+  });
+  showFeedback('soundFeedback', allCorrect, allCorrect?'':'빨간색으로 표시된 칸을 다시 확인해보세요.');
+}
+
+/* ============ init ============ */
+buildAsciiTable();
+nextT2B();
+nextB2T();
+nextDecode();
+nextImagePuzzle();
+nextDrawPuzzle();
+nextSoundPuzzle();
+</script>
+</body>
+</html>
