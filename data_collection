@@ -1,1 +1,1033 @@
 
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>데이터의 수집과 관리 · 연습실</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F5F6FB;
+    --bg-grad: radial-gradient(circle at 15% 0%, #EEF0FF 0%, #F5F6FB 45%), radial-gradient(circle at 85% 100%, #FCEEF3 0%, #F5F6FB 55%);
+    --panel:#FFFFFF;
+    --panel-alt:#F1F2F9;
+    --border:#E3E6F0;
+    --border-soft:#EBEDF5;
+    --text:#1F2430;
+    --muted:#6B7280;
+    --ink:#151A24;
+    --amber:#E2A93F;
+    --amber-dim:rgba(226,169,63,.12);
+    --violet:#6D5DFB;
+    --violet-dim:rgba(109,93,251,.10);
+    --teal:#0EA895;
+    --teal-dim:rgba(14,168,149,.10);
+    --rose:#E24F82;
+    --rose-dim:rgba(226,79,130,.10);
+    --sky:#2F8FE0;
+    --sky-dim:rgba(47,143,224,.10);
+    --danger:#E1483F;
+    --good:#0EA895;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg-grad); background-color:var(--bg); color:var(--text);
+    font-family:'IBM Plex Sans KR', sans-serif; line-height:1.55; padding-bottom:60px; min-height:100vh;
+  }
+  .mono{font-family:'IBM Plex Mono', monospace;}
+  a{color:inherit;}
+
+  .scoreboard{
+    position:fixed; top:14px; right:14px; background:var(--panel); border:1px solid var(--border);
+    border-radius:999px; padding:8px 16px; display:flex; align-items:center; gap:8px;
+    z-index:50; box-shadow:0 4px 16px rgba(31,36,48,.08); font-size:13px;
+  }
+  .scoreboard #scoreText{color:var(--amber); font-weight:600; font-size:14px;}
+  .scoreboard .score-label{color:var(--muted);}
+
+  .hero{max-width:960px; margin:0 auto; padding:56px 24px 28px; text-align:center;}
+  .eyebrow{font-family:'IBM Plex Mono', monospace; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); font-size:12px; margin-bottom:14px;}
+  .hero h1{font-size:clamp(26px, 4.4vw, 40px); margin:0 0 12px; font-weight:700; letter-spacing:-.01em;}
+  .hero p{color:var(--muted); font-size:clamp(14px,2vw,16px); max-width:600px; margin:0 auto 30px;}
+
+  .hero-chips{display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin:0 auto;}
+  .hero-chip{
+    background:var(--panel); border:1px solid var(--border); border-radius:999px;
+    padding:10px 18px; font-size:14px; font-weight:600; color:var(--muted);
+    transition:all .3s ease;
+  }
+  .hero-chip.on{color:var(--ink); background:var(--amber); border-color:transparent; transform:translateY(-2px);}
+  .hero-caption{font-size:11.5px; color:var(--muted); margin-top:14px;}
+
+  .tabs{max-width:960px; margin:34px auto 0; padding:0 24px; display:flex; gap:9px; justify-content:center; flex-wrap:wrap;}
+  .tab-btn{
+    font-family:'IBM Plex Sans KR', sans-serif; font-size:13.5px; font-weight:600;
+    background:var(--panel); color:var(--muted); border:1px solid var(--border);
+    padding:10px 16px; border-radius:999px; cursor:pointer; display:flex; align-items:center; gap:7px;
+    transition:all .18s ease;
+  }
+  .tab-btn .num{font-family:'IBM Plex Mono',monospace; font-size:11px; opacity:.7;}
+  .tab-btn:hover{border-color:var(--border-soft); color:var(--text);}
+  .tab-btn.active{color:var(--ink); border-color:transparent;}
+  .tab-btn[data-target="m1"].active{background:var(--amber);}
+  .tab-btn[data-target="m2"].active{background:var(--violet);}
+  .tab-btn[data-target="m3"].active{background:var(--teal);}
+  .tab-btn[data-target="m4"].active{background:var(--rose);}
+  .tab-btn[data-target="m5"].active{background:var(--sky);}
+
+  main{max-width:960px; margin:0 auto; padding:36px 24px 10px;}
+  .module{display:none;}
+  .module.active{display:block; animation:fadeIn .35s ease;}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+
+  .module-head h2{font-size:clamp(20px,3vw,25px); margin:0 0 8px; display:flex; align-items:center; gap:10px;}
+  .module-head .tag{font-size:12px; padding:3px 9px; border-radius:6px; border:1px solid var(--border); color:var(--muted); font-weight:600;}
+  .module-head p{color:var(--muted); margin:0 0 22px; font-size:14.5px; max-width:700px;}
+  .module-head p b{color:var(--text);}
+
+  .concept-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-bottom:22px;}
+  @media (max-width:680px){.concept-grid{grid-template-columns:1fr;}}
+  .concept-card{background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:16px 18px;}
+  .concept-card h4{margin:0 0 6px; font-size:14px;}
+  .concept-card p{margin:0; font-size:12.8px; color:var(--muted);}
+
+  .card{background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:22px; margin-bottom:18px; box-shadow:0 1px 3px rgba(31,36,48,.05);}
+  .card-label{font-size:13px; color:var(--muted); font-weight:600; margin-bottom:14px; letter-spacing:.02em;}
+  .prompt-box{background:var(--panel-alt); border-radius:12px; padding:18px; margin-bottom:16px; font-size:15px; line-height:1.6;}
+
+  .choice-list{display:flex; flex-direction:column; gap:8px; margin-bottom:14px;}
+  .choice-btn{
+    text-align:left; background:var(--bg); border:1px solid var(--border); color:var(--text);
+    border-radius:10px; padding:12px 14px; font-size:14px; cursor:pointer; font-family:inherit;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .choice-btn:hover{border-color:var(--border-soft);}
+  .choice-btn.selected{border-color:var(--amber); background:var(--amber-dim);}
+  .choice-btn.correct{border-color:var(--good); background:var(--teal-dim); color:var(--good);}
+  .choice-btn.wrong{border-color:var(--danger); background:rgba(255,107,107,.1); color:var(--danger);}
+
+  button{
+    font-family:'IBM Plex Sans KR', sans-serif; font-weight:600; font-size:14px;
+    background:var(--amber); color:#20160A; border:none; border-radius:10px;
+    padding:11px 18px; cursor:pointer; transition:transform .12s ease;
+  }
+  button:hover{transform:translateY(-1px);}
+  button.ghost{background:transparent; color:var(--muted); border:1px solid var(--border); margin-top:10px; width:100%;}
+  button.ghost:hover{color:var(--text); border-color:var(--border-soft);}
+  button.block{width:100%;}
+
+  .feedback{min-height:20px; margin-top:8px; font-size:13.5px; font-weight:600;}
+  .feedback.good{color:var(--good);}
+  .feedback.bad{color:var(--danger);}
+  .why{font-size:12.8px; color:var(--muted); margin-top:6px;}
+
+  /* module2 tip box */
+  .tip-box{background:var(--violet-dim); border:1px solid rgba(155,140,255,.35); border-radius:12px; padding:14px 16px; margin-bottom:20px; font-size:13px;}
+  .tip-box h4{margin:0 0 8px; color:var(--violet); font-size:13.5px;}
+  .tip-table{width:100%; border-collapse:collapse; font-size:12.5px;}
+  .tip-table td{padding:5px 6px; border-bottom:1px solid rgba(255,255,255,.06); color:var(--muted);}
+  .tip-table td.op{font-family:'IBM Plex Mono',monospace; color:var(--violet); font-weight:700; width:50px;}
+
+  /* module3 checklist */
+  .crit-list{display:flex; flex-direction:column; gap:8px; margin-bottom:16px;}
+  .crit-item{display:flex; align-items:center; gap:10px; background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:11px 14px; cursor:pointer;}
+  .crit-item input{accent-color:var(--teal); width:16px; height:16px;}
+  .crit-item label{font-size:13.5px; cursor:pointer; flex:1;}
+  .crit-item.none{border-color:var(--border-soft);}
+
+  /* module4 folder game */
+  .folder-item{background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:12px 14px; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;}
+  .folder-item .txt{font-size:13.5px; flex:1; min-width:180px;}
+  .folder-btns{display:flex; gap:6px;}
+  .folder-btn{
+    background:var(--panel-alt); border:1px solid var(--border); color:var(--muted);
+    padding:7px 12px; border-radius:8px; font-size:12.5px; cursor:pointer; font-weight:600;
+  }
+  .folder-btn.chosen{background:var(--rose-dim); border-color:var(--rose); color:var(--rose);}
+  .folder-btn.right{background:var(--teal-dim); border-color:var(--good); color:var(--good);}
+  .folder-btn.wrongc{background:rgba(255,107,107,.1); border-color:var(--danger); color:var(--danger);}
+
+  /* module5 practicum */
+  .practicum-card{background:var(--panel); border:1px dashed var(--sky); border-radius:var(--radius); padding:24px; margin-bottom:18px; box-shadow:0 1px 3px rgba(31,36,48,.05);}
+  .site-btn{background:var(--sky); color:#0A2233;}
+  .checklist{display:flex; flex-direction:column; gap:10px; margin:16px 0;}
+  .checklist label{display:flex; align-items:flex-start; gap:10px; font-size:13.8px; cursor:pointer; background:var(--bg); border:1px solid var(--border); padding:12px 14px; border-radius:10px;}
+  .checklist input{accent-color:var(--sky); margin-top:2px; width:16px; height:16px; flex:none;}
+  .progress-wrap{background:var(--panel-alt); border-radius:999px; height:10px; overflow:hidden; margin:10px 0 18px;}
+  .progress-bar{height:100%; background:var(--sky); width:0%; transition:width .3s ease;}
+  .progress-label{font-size:12.5px; color:var(--muted); margin-bottom:4px;}
+
+  .verify-table{width:100%; border-collapse:collapse; margin-bottom:16px;}
+  .verify-table th, .verify-table td{border:1px solid var(--border-soft); padding:10px; font-size:13px; text-align:left; vertical-align:top;}
+  .verify-table th{background:var(--panel-alt); color:var(--sky); font-size:12.5px;}
+  .verify-table select{background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:6px; padding:6px 8px; font-family:'IBM Plex Mono',monospace;}
+  .verify-table input[type="text"]{width:100%; background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:6px; padding:7px 9px; font-size:12.8px;}
+
+  .capture-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+  @media (max-width:600px){.capture-grid{grid-template-columns:1fr;}}
+  .capture-box{background:var(--bg); border:1px solid var(--border); border-radius:12px; padding:14px;}
+  .capture-label{font-size:12.5px; color:var(--muted); font-weight:600; margin-bottom:8px;}
+  .upload-drop{
+    display:flex; align-items:center; justify-content:center; flex-direction:column; gap:6px;
+    min-height:140px; border:1.5px dashed var(--border); border-radius:10px; cursor:pointer;
+    background:var(--panel); color:var(--muted); font-size:12.8px; overflow:hidden; transition:border-color .15s ease;
+  }
+  .upload-drop:hover{border-color:var(--sky);}
+  .upload-drop:focus, .upload-drop.target-active{border-color:var(--sky); box-shadow:0 0 0 3px var(--sky-dim); outline:none;}
+  .link-btn{
+    background:none; border:none; color:var(--sky); font-weight:600; font-size:12.8px;
+    padding:0; cursor:pointer; text-decoration:underline; font-family:inherit;
+  }
+  .capture-preview{width:100%; max-height:220px; object-fit:contain; border-radius:8px;}
+
+  .answer-row{display:flex; gap:10px; flex-wrap:wrap;}
+  .answer-row input[type="text"]{
+    flex:1; min-width:180px; background:var(--bg); border:1px solid var(--border); color:var(--text);
+    border-radius:10px; padding:11px 13px; font-size:14px; font-family:'IBM Plex Sans KR', sans-serif; outline:none;
+  }
+  .answer-row input[type="text"]:focus{border-color:var(--sky);}
+
+  .answer-key{display:none; background:var(--panel-alt); border-radius:10px; padding:14px 16px; font-size:12.8px; color:var(--muted); margin-bottom:14px;}
+  .answer-key.show{display:block;}
+  .answer-key div{margin-bottom:4px;}
+
+  textarea{
+    width:100%; min-height:90px; background:var(--bg); border:1px solid var(--border); color:var(--text);
+    border-radius:10px; padding:12px 14px; font-family:'IBM Plex Sans KR',sans-serif; font-size:13.5px; resize:vertical;
+  }
+  .radio-row{display:flex; gap:14px; margin:10px 0 16px; flex-wrap:wrap;}
+  .radio-row label{display:flex; align-items:center; gap:6px; font-size:13.5px; color:var(--muted); cursor:pointer;}
+  .radio-row input{accent-color:var(--sky);}
+
+  .summary{max-width:960px; margin:44px auto 0; padding:0 24px;}
+  .summary-card{background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:24px;}
+  .summary-card h3{margin:0 0 14px; font-size:16px;}
+  .summary-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:16px;}
+  @media (max-width:720px){.summary-grid{grid-template-columns:1fr;}}
+  .summary-item{border-left:3px solid var(--border-soft); padding-left:12px;}
+  .summary-item.c1{border-color:var(--violet);}
+  .summary-item.c2{border-color:var(--teal);}
+  .summary-item.c3{border-color:var(--rose);}
+  .summary-item h4{margin:0 0 6px; font-size:13.5px;}
+  .summary-item p{margin:0; font-size:12.3px; color:var(--muted); line-height:1.6;}
+</style>
+</head>
+<body>
+
+  <div class="scoreboard"><span id="scoreText">0 / 0</span><span class="score-label">정답</span></div>
+
+  <header class="hero">
+    <div class="eyebrow">Ⅱ-2-01 · 데이터의 수집과 관리</div>
+    <h1>필요한 데이터를 모으고 똑똑하게 관리하기</h1>
+    <p>문제 해결에 맞는 데이터를 수집하는 방법, 데이터를 검증하는 기준, 데이터를 분류·관리하는 방법을 연습해봐요.</p>
+    <div class="hero-chips" id="heroChips"></div>
+    <div class="hero-caption">데이터 수집의 네 가지 방법이 차례로 반짝여요</div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab-btn active" data-target="m1"><span class="num">01</span>중요성</button>
+    <button class="tab-btn" data-target="m2"><span class="num">02</span>수집 방법</button>
+    <button class="tab-btn" data-target="m3"><span class="num">03</span>주의할 점</button>
+    <button class="tab-btn" data-target="m4"><span class="num">04</span>분류와 관리</button>
+    <button class="tab-btn" data-target="m5"><span class="num">05</span>실습해보기</button>
+  </nav>
+
+  <main>
+
+    <!-- ============ MODULE 1 : 중요성 ============ -->
+    <section id="m1" class="module active">
+      <div class="module-head">
+        <h2><span class="tag">01</span> 데이터 수집의 중요성</h2>
+        <p>문제를 해결하거나 의사 결정을 할 때, <b>목적에 맞는 데이터</b>를 수집하고 분석하면 느낌이나 직관보다 <b>합리적이고 객관적</b>으로 문제를 해결할 수 있어요.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-label">문제 상황을 보고, 가장 적절한 데이터를 골라보세요</div>
+        <div class="prompt-box" id="impSituation"></div>
+        <div class="choice-list" id="impChoices"></div>
+        <button onclick="checkImportance()" class="block">확인</button>
+        <div class="feedback" id="impFeedback"></div>
+        <button class="ghost" onclick="nextImportance()">다음 문제 →</button>
+      </div>
+    </section>
+
+    <!-- ============ MODULE 2 : 수집 방법 ============ -->
+    <section id="m2" class="module">
+      <div class="module-head">
+        <h2><span class="tag">02</span> 데이터 수집 방법</h2>
+        <p>수집하려는 목적에 따라 알맞은 방법을 선택해야 해요. 대표적으로 <b>관찰, 설문 조사, 웹 검색, 공공 데이터 활용</b> 네 가지 방법이 있어요.</p>
+      </div>
+
+      <div class="concept-grid">
+        <div class="concept-card"><h4>👀 관찰</h4><p>사람의 눈이나 센서로 데이터를 직접 수집해요. 일상 속 문제를 해결할 때 적합해요.</p></div>
+        <div class="concept-card"><h4>📋 설문 조사</h4><p>질문지를 배포해 사람들의 생각이나 정보를 효율적으로 수집해요.</p></div>
+        <div class="concept-card"><h4>🔍 웹 검색</h4><p>검색 엔진에 검색어를 입력해 원하는 데이터를 찾아요. 검색 연산자를 쓰면 더 빠르게 찾을 수 있어요.</p></div>
+        <div class="concept-card"><h4>🗄️ 공공 데이터 활용</h4><p>공공 기관이 공개하는 데이터를 활용해요. 개인이 얻기 어려운 데이터에 적합해요.</p></div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">상황에 알맞은 수집 방법을 골라보세요</div>
+        <div class="prompt-box" id="methodSituation"></div>
+        <div class="choice-list" id="methodChoices"></div>
+        <button onclick="checkMethod()" class="block">확인</button>
+        <div class="feedback" id="methodFeedback"></div>
+        <button class="ghost" onclick="nextMethod()">다음 문제 →</button>
+      </div>
+
+      <div class="tip-box">
+        <h4>🔎 웹 검색 연산자 팁</h4>
+        <table class="tip-table">
+          <tr><td class="op">" "</td><td>정확히 일치하는 결과를 찾는 단어에 사용</td></tr>
+          <tr><td class="op">+</td><td>검색 결과 중 반드시 포함되어야 하는 단어 앞에 사용</td></tr>
+          <tr><td class="op">-</td><td>검색 결과 중 제외할 단어 앞에 사용</td></tr>
+          <tr><td class="op">|</td><td>여러 단어 중 하나 이상 포함된 문서를 찾을 때 사용</td></tr>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-label">검색 목표에 맞는 검색어를 골라보세요</div>
+        <div class="prompt-box" id="searchGoal"></div>
+        <div class="choice-list" id="searchChoices"></div>
+        <button onclick="checkSearch()" class="block">확인</button>
+        <div class="feedback" id="searchFeedback"></div>
+        <button class="ghost" onclick="nextSearch()">다음 문제 →</button>
+      </div>
+    </section>
+
+    <!-- ============ MODULE 3 : 주의할 점 ============ -->
+    <section id="m3" class="module">
+      <div class="module-head">
+        <h2><span class="tag">03</span> 데이터 수집 시 주의할 점</h2>
+        <p>데이터를 수집할 때는 <b>① 목적에 맞는지 ② 정확하고 신뢰할 만한지 ③ 충분하고 치우치지 않았는지 ④ 최신 데이터인지</b> 확인해야 해요.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-label">아래 상황에서 어긴 기준을 모두 선택하세요 (문제가 없다면 '문제없음' 선택)</div>
+        <div class="prompt-box" id="critSituation"></div>
+        <div class="crit-list" id="critList"></div>
+        <button onclick="checkCriteria()" class="block">확인</button>
+        <div class="feedback" id="critFeedback"></div>
+        <button class="ghost" onclick="nextCriteria()">다음 문제 →</button>
+      </div>
+    </section>
+
+    <!-- ============ MODULE 4 : 분류와 관리 ============ -->
+    <section id="m4" class="module">
+      <div class="module-head">
+        <h2><span class="tag">04</span> 데이터의 분류와 관리</h2>
+        <p>수집한 데이터는 <b>폴더 구조</b>(목적과 의미에 따라 나누기)나 <b>메타데이터</b>(속성·태그를 활용해 다양한 기준으로 찾기)를 활용해 관리할 수 있어요.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-label">어떤 방법으로 관리하는 것이 더 적합할까요?</div>
+        <div class="prompt-box" id="classifySituation"></div>
+        <div class="choice-list" id="classifyChoices"></div>
+        <button onclick="checkClassify()" class="block">확인</button>
+        <div class="feedback" id="classifyFeedback"></div>
+        <button class="ghost" onclick="nextClassify()">다음 문제 →</button>
+      </div>
+
+      <div class="card">
+        <div class="card-label">폴더 배치 게임 — 각 데이터를 알맞은 폴더에 넣어보세요</div>
+        <div id="folderGame"></div>
+        <button onclick="checkFolderGame()" class="block">전체 채점하기</button>
+        <div class="feedback" id="folderFeedback"></div>
+        <button class="ghost" onclick="nextFolderGame()">다른 데이터로 →</button>
+      </div>
+    </section>
+
+    <!-- ============ MODULE 5 : 실습해보기 ============ -->
+    <section id="m5" class="module">
+      <div class="module-head">
+        <h2><span class="tag">05</span> 실습해보기</h2>
+        <p>실제 공공 데이터 사이트에서 데이터를 수집하고, 검증하고, 분류해보는 활동이에요. <b>기상자료개방포털</b>에서 우리 지역의 기온 변화를 직접 조사해보세요.</p>
+      </div>
+
+      <div class="practicum-card">
+        <div class="card-label">1단계 · 데이터 수집하기</div>
+        <p style="font-size:13.5px; color:var(--muted); margin-top:0;">아래 버튼을 눌러 사이트로 이동한 뒤, 우리 지역 관측지점을 선택하고 <b>10년 전</b>과 <b>올해</b> 두 시점의 평균기온을 각각 검색해서 캡처(스크린샷)로 남겨보세요.</p>
+        <button class="site-btn" onclick="window.open('https://data.kma.go.kr/', '_blank')">🔗 기상자료개방포털 사이트 열기</button>
+
+        <div class="progress-label" style="margin-top:20px;">진행률: <span id="progressPct">0%</span></div>
+        <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+        <div class="checklist" id="practicumChecklist"></div>
+      </div>
+
+      <div class="practicum-card">
+        <div class="card-label">2단계 · 캡처한 화면 첨부하기</div>
+        <p style="font-size:13.5px; color:var(--muted); margin-top:0;">1단계에서 캡처한 두 장의 스크린샷을 아래에 첨부해보세요. 박스를 클릭한 뒤 캡처한 화면을 그대로 <b>붙여넣기(Ctrl+V)</b>하거나, 저장해둔 파일을 선택할 수 있어요.</p>
+        <div class="capture-grid">
+          <div class="capture-box">
+            <div class="capture-label">10년 전 캡처 이미지</div>
+            <div class="upload-drop" id="img1Drop" tabindex="0">
+              <img id="img1Preview" class="capture-preview" style="display:none;">
+              <span id="img1Placeholder">클릭 후 <b class="mono">Ctrl+V</b>로 붙여넣기<br>또는 <button type="button" class="link-btn" id="img1Browse">파일 선택</button></span>
+            </div>
+            <input type="file" id="img1Input" accept="image/*" style="display:none;">
+          </div>
+          <div class="capture-box">
+            <div class="capture-label">올해 캡처 이미지</div>
+            <div class="upload-drop" id="img2Drop" tabindex="0">
+              <img id="img2Preview" class="capture-preview" style="display:none;">
+              <span id="img2Placeholder">클릭 후 <b class="mono">Ctrl+V</b>로 붙여넣기<br>또는 <button type="button" class="link-btn" id="img2Browse">파일 선택</button></span>
+            </div>
+            <input type="file" id="img2Input" accept="image/*" style="display:none;">
+          </div>
+        </div>
+      </div>
+
+      <div class="practicum-card">
+        <div class="card-label">3단계 · 분석 결과 작성하기</div>
+        <p style="font-size:13.5px; color:var(--muted); margin-top:0;">두 캡처를 비교해서 기온이 얼마나, 어떻게 달라졌는지, 그 이유는 무엇일지 자신의 생각을 적어보세요.</p>
+        <textarea id="analysisText" placeholder="예: 10년 전 연평균기온은 13.2도였고 올해는 14.1도로 약 0.9도 올랐다. 기후 변화의 영향으로 보인다."></textarea>
+      </div>
+
+      <div class="practicum-card">
+        <div class="card-label">4단계 · 제출하기</div>
+        <p style="font-size:13.5px; color:var(--muted); margin-top:0;">이름을 입력하고 버튼을 누르면 캡처 이미지와 분석 결과가 담긴 제출 파일이 만들어져요. 이 파일을 선생님이 안내한 곳에 업로드하면 제출이 완료됩니다.</p>
+        <div class="answer-row" style="margin-bottom:14px;">
+          <input type="text" id="studentNameInput" placeholder="이름 (또는 이름+번호)">
+        </div>
+        <button class="site-btn block" onclick="buildSubmissionFile()">📦 제출 파일 만들기</button>
+        <div class="feedback" id="submitFeedback"></div>
+
+        <div class="tip-box" style="margin-top:18px;">
+          <h4>📤 제출 방법 안내</h4>
+          <p style="margin:0 0 6px;">1. 위 버튼을 누르면 <span class="mono">기온변화_제출_이름.pdf</span> 파일이 자동으로 컴퓨터에 다운로드돼요.</p>
+          <p style="margin:0 0 6px;">2. 선생님의 GitHub 저장소에 <span class="mono">submissions</span> 폴더가 있다면, 그 안에 이 파일을 업로드해요. (선생님이 Settings → Collaborators에서 학생을 초대해두면 직접 업로드할 수 있어요)</p>
+          <p style="margin:0;">3. 학급 인원이 많거나 GitHub 업로드가 어렵다면, 선생님이 안내한 구글 클래스룸 과제 제출함이나 공유 드라이브 폴더에 올려도 좋아요.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="summary">
+    <div class="summary-card">
+      <h3>핵심 정리</h3>
+      <div class="summary-grid">
+        <div class="summary-item c1"><h4>수집 방법</h4><p>관찰 · 설문 조사<br>웹 검색 · 공공 데이터 활용</p></div>
+        <div class="summary-item c2"><h4>검증 기준</h4><p>목적 · 정확성<br>충분성 · 최신성</p></div>
+        <div class="summary-item c3"><h4>분류·관리</h4><p>폴더 구조 활용<br>메타데이터 활용</p></div>
+      </div>
+    </div>
+  </div>
+
+<script>
+function $(id){return document.getElementById(id);}
+function randInt(min,max){return Math.floor(Math.random()*(max-min+1))+min;}
+function shuffle(arr){const a=arr.slice(); for(let i=a.length-1;i>0;i--){const j=randInt(0,i); [a[i],a[j]]=[a[j],a[i]];} return a;}
+function pickDifferent(arr, lastIdx){
+  if(arr.length===1) return 0;
+  let idx; do{ idx=randInt(0,arr.length-1); } while(idx===lastIdx);
+  return idx;
+}
+
+let totalCorrect=0, totalAttempts=0;
+function recordAnswer(correct){
+  totalAttempts++; if(correct) totalCorrect++;
+  $('scoreText').textContent = totalCorrect+' / '+totalAttempts;
+}
+function showFeedback(elId, correct, msg){
+  const el=$(elId);
+  el.textContent = (correct? '정답이에요! 🎉 ':'아쉬워요. ') + (msg||'');
+  el.className = 'feedback ' + (correct?'good':'bad');
+}
+
+/* ============ tabs ============ */
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.module').forEach(m=>m.classList.remove('active'));
+    btn.classList.add('active');
+    $(btn.dataset.target).classList.add('active');
+  });
+});
+
+/* ============ hero chips ============ */
+const METHODS=['관찰','설문 조사','웹 검색','공공 데이터 활용'];
+function buildHeroChips(){
+  const el=$('heroChips'); el.innerHTML='';
+  METHODS.forEach(m=>{
+    const chip=document.createElement('div');
+    chip.className='hero-chip mono'; chip.textContent=m;
+    el.appendChild(chip);
+  });
+}
+buildHeroChips();
+let heroIdx=0;
+setInterval(()=>{
+  document.querySelectorAll('.hero-chip').forEach((c,i)=>c.classList.toggle('on', i===heroIdx));
+  heroIdx=(heroIdx+1)%METHODS.length;
+}, 850);
+
+/* ============ MODULE 1 : 중요성 ============ */
+const IMPORTANCE_BANK=[
+  {situation:"편의점 사장님이 어떤 상품을 더 들여놓을지 정하고 싶어요.", options:[
+    {text:"최근 3개월간 상품별 판매 데이터", correct:true, why:"실제 판매 데이터를 분석하면 어떤 상품이 잘 팔리는지 객관적으로 알 수 있어요."},
+    {text:"사장님이 어릴 적 좋아했던 간식 목록", correct:false, why:"문제 해결과 관련이 없는 데이터예요."},
+    {text:"10년 전 상품별 판매 데이터", correct:false, why:"너무 오래된 데이터라 지금 상황을 반영하지 못해요."}
+  ]},
+  {situation:"학교에서 급식 메뉴 만족도를 높이고 싶어요.", options:[
+    {text:"이번 달 전교생 대상 급식 만족도 설문 결과", correct:true, why:"목적에 맞고 표본도 충분한 데이터예요."},
+    {text:"작년 졸업생 중 5명에게만 물어본 의견", correct:false, why:"표본이 너무 적고 한쪽으로 치우쳐 있어요."},
+    {text:"다른 학교의 급식 사진", correct:false, why:"우리 학교 문제 해결과 관련성이 낮아요."}
+  ]},
+  {situation:"헬스장에서 자주 이용하는 운동기구를 파악해 기구를 추가하고 싶어요.", options:[
+    {text:"최근 한 달간 기구별 이용 횟수 기록", correct:true, why:"목적에 맞고 최신 데이터예요."},
+    {text:"헬스장 근처 카페 리뷰", correct:false, why:"문제 해결과 관련 없는 데이터예요."},
+    {text:"5년 전 기구 이용 통계", correct:false, why:"오래된 데이터라 지금 상황과 다를 수 있어요."}
+  ]},
+  {situation:"동아리 부장이 부원들의 활동 만족도를 알고 싶어요.", options:[
+    {text:"이번 학기 전체 부원 대상 설문 조사", correct:true, why:"목적에 맞고 표본이 충분해요."},
+    {text:"친한 친구 2명에게만 물어본 감상", correct:false, why:"표본이 부족하고 치우쳐 있어요."},
+    {text:"다른 동아리 활동 사진", correct:false, why:"관련성이 낮은 데이터예요."}
+  ]},
+  {situation:"영상 서비스가 사용자에게 어울리는 영상을 추천하고 싶어요.", options:[
+    {text:"사용자의 최근 시청 기록과 좋아요 데이터", correct:true, why:"목적에 맞고 정확한 최신 데이터예요."},
+    {text:"사용자의 이름과 생년월일만", correct:false, why:"영상 추천 목적과 관련이 없어요."},
+    {text:"10년 전 유행했던 영상 목록", correct:false, why:"지금 취향을 반영하지 못하는 오래된 데이터예요."}
+  ]}
+];
+let impIdx=-1, impSelected=null;
+function nextImportance(){
+  impIdx = pickDifferent(IMPORTANCE_BANK, impIdx);
+  const item = IMPORTANCE_BANK[impIdx];
+  $('impSituation').textContent = item.situation;
+  const opts = shuffle(item.options.map((o,i)=>({...o, origIdx:i})));
+  const wrap=$('impChoices'); wrap.innerHTML='';
+  impSelected=null;
+  opts.forEach(o=>{
+    const btn=document.createElement('button');
+    btn.className='choice-btn'; btn.type='button'; btn.textContent=o.text;
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('#impChoices .choice-btn').forEach(b=>b.classList.remove('selected'));
+      btn.classList.add('selected'); impSelected=o;
+    });
+    wrap.appendChild(btn);
+  });
+  $('impFeedback').textContent=''; $('impFeedback').className='feedback';
+}
+function checkImportance(){
+  if(!impSelected){ showFeedback('impFeedback', false, '선택지를 하나 골라주세요.'); return; }
+  const correct = impSelected.correct;
+  document.querySelectorAll('#impChoices .choice-btn').forEach((b,i)=>{
+    if(b.textContent===impSelected.text) b.classList.add(correct?'correct':'wrong');
+  });
+  showFeedback('impFeedback', correct, impSelected.why);
+  recordAnswer(correct);
+}
+
+/* ============ MODULE 2A : 수집 방법 매칭 ============ */
+const METHOD_BANK=[
+  {situation:"교실 안에서 학생들이 쉬는 시간에 무엇을 하는지 직접 살펴보고 기록한다.", answer:"관찰"},
+  {situation:"반 친구들에게 좋아하는 급식 메뉴를 질문지로 물어본다.", answer:"설문 조사"},
+  {situation:"'요즘 유행하는 노래'라는 검색어로 인터넷에서 정보를 찾는다.", answer:"웹 검색"},
+  {situation:"행정안전부에서 제공하는 지역별 인구 통계를 내려받는다.", answer:"공공 데이터 활용"},
+  {situation:"버스 정류장에서 사람들이 얼마나 오래 기다리는지 시간을 재며 지켜본다.", answer:"관찰"},
+  {situation:"온라인 설문지를 만들어 전교생에게 배포해 응답을 받는다.", answer:"설문 조사"},
+  {situation:"기상청에서 제공하는 지역별 날씨 데이터를 다운로드한다.", answer:"공공 데이터 활용"},
+  {situation:"검색 연산자를 사용해 필요한 뉴스 기사만 걸러서 찾는다.", answer:"웹 검색"}
+];
+let methodIdx=-1, methodSelected=null;
+function nextMethod(){
+  methodIdx = pickDifferent(METHOD_BANK, methodIdx);
+  const item = METHOD_BANK[methodIdx];
+  $('methodSituation').textContent = item.situation;
+  const opts = shuffle(METHODS);
+  const wrap=$('methodChoices'); wrap.innerHTML='';
+  methodSelected=null;
+  opts.forEach(m=>{
+    const btn=document.createElement('button');
+    btn.className='choice-btn'; btn.type='button'; btn.textContent=m;
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('#methodChoices .choice-btn').forEach(b=>b.classList.remove('selected'));
+      btn.classList.add('selected'); methodSelected=m;
+    });
+    wrap.appendChild(btn);
+  });
+  $('methodFeedback').textContent=''; $('methodFeedback').className='feedback';
+}
+function checkMethod(){
+  if(!methodSelected){ showFeedback('methodFeedback', false, '선택지를 하나 골라주세요.'); return; }
+  const item = METHOD_BANK[methodIdx];
+  const correct = methodSelected===item.answer;
+  document.querySelectorAll('#methodChoices .choice-btn').forEach(b=>{
+    if(b.textContent===item.answer) b.classList.add('correct');
+    else if(b.textContent===methodSelected && !correct) b.classList.add('wrong');
+  });
+  showFeedback('methodFeedback', correct, correct?'':('정답: '+item.answer));
+  recordAnswer(correct);
+}
+
+/* ============ MODULE 2B : 웹 검색 연산자 ============ */
+const SEARCH_BANK=[
+  {goal:"정확히 '인공지능'이라는 단어가 그대로 포함된 문서만 찾고 싶다.",
+   options:["인공지능", "\"인공지능\"", "인공지능 -로봇", "인공지능|로봇"], answer:"\"인공지능\""},
+  {goal:"고양이 영상 중에서 '먹방'은 반드시 포함하고 싶다.",
+   options:["고양이 먹방", "고양이 +먹방", "고양이 -먹방", "고양이|먹방"], answer:"고양이 +먹방"},
+  {goal:"여행 정보를 찾되 '광고'라는 단어는 결과에서 빼고 싶다.",
+   options:["여행 -광고", "여행 +광고", "\"여행 광고\"", "여행|광고"], answer:"여행 -광고"},
+  {goal:"'파이썬' 또는 '자바' 둘 중 하나라도 포함된 자료를 찾고 싶다.",
+   options:["파이썬 자바", "파이썬|자바", "파이썬 -자바", "\"파이썬 자바\""], answer:"파이썬|자바"},
+  {goal:"정확한 문장 '데이터의 수집과 관리'가 그대로 들어간 자료를 찾고 싶다.",
+   options:["데이터의 수집과 관리", "\"데이터의 수집과 관리\"", "데이터 +수집 +관리", "데이터|수집|관리"], answer:"\"데이터의 수집과 관리\""}
+];
+let searchIdx=-1, searchSelected=null;
+function nextSearch(){
+  searchIdx = pickDifferent(SEARCH_BANK, searchIdx);
+  const item = SEARCH_BANK[searchIdx];
+  $('searchGoal').textContent = item.goal;
+  const opts = shuffle(item.options);
+  const wrap=$('searchChoices'); wrap.innerHTML='';
+  searchSelected=null;
+  opts.forEach(o=>{
+    const btn=document.createElement('button');
+    btn.className='choice-btn mono'; btn.type='button'; btn.textContent=o;
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('#searchChoices .choice-btn').forEach(b=>b.classList.remove('selected'));
+      btn.classList.add('selected'); searchSelected=o;
+    });
+    wrap.appendChild(btn);
+  });
+  $('searchFeedback').textContent=''; $('searchFeedback').className='feedback';
+}
+function checkSearch(){
+  if(!searchSelected){ showFeedback('searchFeedback', false, '선택지를 하나 골라주세요.'); return; }
+  const item = SEARCH_BANK[searchIdx];
+  const correct = searchSelected===item.answer;
+  document.querySelectorAll('#searchChoices .choice-btn').forEach(b=>{
+    if(b.textContent===item.answer) b.classList.add('correct');
+    else if(b.textContent===searchSelected && !correct) b.classList.add('wrong');
+  });
+  showFeedback('searchFeedback', correct, correct?'':('정답: '+item.answer));
+  recordAnswer(correct);
+}
+
+/* ============ MODULE 3 : 검증 기준 ============ */
+const CRIT_LABELS=["목적에 맞는 데이터인가?","정확하고 신뢰할 만한 데이터인가?","충분하고 치우치지 않은 데이터인가?","최신 데이터인가?"];
+const CRIT_BANK=[
+  {situation:"5년 전 설문 결과로 요즘 학생들이 좋아하는 아이돌을 조사하려 한다.", violated:[3]},
+  {situation:"친한 친구 3명에게만 물어보고 전교생의 의견이라고 결론지었다.", violated:[2]},
+  {situation:"출처가 불분명한 블로그 글만 보고 통계 자료로 사용했다.", violated:[1]},
+  {situation:"핸드폰 판매량을 알고 싶은데 아이스크림 판매량 데이터를 모았다.", violated:[0]},
+  {situation:"행정안전부의 최신 인구 통계를 목적에 맞게 다운로드해 사용했다.", violated:[]},
+  {situation:"10년 전 통계 자료를 신뢰할 수 있는 기관에서 받았지만 그대로 사용했다.", violated:[3]}
+];
+let critIdx=-1;
+function nextCriteria(){
+  critIdx = pickDifferent(CRIT_BANK, critIdx);
+  const item = CRIT_BANK[critIdx];
+  $('critSituation').textContent = item.situation;
+  const wrap=$('critList'); wrap.innerHTML='';
+  CRIT_LABELS.forEach((label,i)=>{
+    const row=document.createElement('div'); row.className='crit-item';
+    row.innerHTML = `<input type="checkbox" class="crit-box" value="${i}" id="crit_${i}"><label for="crit_${i}">${label}</label>`;
+    wrap.appendChild(row);
+  });
+  const noneRow=document.createElement('div'); noneRow.className='crit-item none';
+  noneRow.innerHTML = `<input type="checkbox" id="crit_none"><label for="crit_none">문제없음 (모든 기준을 만족함)</label>`;
+  wrap.appendChild(noneRow);
+
+  document.querySelectorAll('.crit-box').forEach(cb=>{
+    cb.addEventListener('change', ()=>{ if(cb.checked) $('crit_none').checked=false; });
+  });
+  $('crit_none').addEventListener('change', ()=>{
+    if($('crit_none').checked) document.querySelectorAll('.crit-box').forEach(cb=>cb.checked=false);
+  });
+  $('critFeedback').textContent=''; $('critFeedback').className='feedback';
+}
+function checkCriteria(){
+  const item = CRIT_BANK[critIdx];
+  const selected = Array.from(document.querySelectorAll('.crit-box:checked')).map(cb=>parseInt(cb.value,10)).sort();
+  const correctArr = item.violated.slice().sort();
+  const correct = JSON.stringify(selected)===JSON.stringify(correctArr);
+  const msg = correct ? '' : (correctArr.length ? '정답: '+correctArr.map(i=>CRIT_LABELS[i]).join(', ') : '정답: 문제없음 (모든 기준 만족)');
+  showFeedback('critFeedback', correct, msg);
+  recordAnswer(correct);
+}
+
+/* ============ MODULE 4A : 분류 방법 선택 ============ */
+const CLASSIFY_BANK=[
+  {situation:"학교 폴더 안에 과목별로, 다시 학년별로 세부 폴더를 나누어 자료를 정리하고 싶다.", answer:"폴더 구조 활용"},
+  {situation:"사진에 저장된 촬영 날짜, 장소, 인물 태그를 기준으로 다양하게 찾고 싶다.", answer:"메타데이터 활용"},
+  {situation:"옷장 정리하듯 종류별로 뚜렷하게 나눠서 자료를 저장하고 싶다.", answer:"폴더 구조 활용"},
+  {situation:"같은 사진을 '여행별'로도, '날짜별'로도 다양한 기준으로 찾아보고 싶다.", answer:"메타데이터 활용"},
+  {situation:"동아리, 수업, 가족처럼 명확한 목적과 의미에 따라 큰 틀로 나누고 싶다.", answer:"폴더 구조 활용"},
+  {situation:"파일에 저장된 크기, 생성 일자, 태그 정보를 활용해 자동으로 데이터를 관리하고 싶다.", answer:"메타데이터 활용"}
+];
+let classifyIdx=-1, classifySelected=null;
+function nextClassify(){
+  classifyIdx = pickDifferent(CLASSIFY_BANK, classifyIdx);
+  const item = CLASSIFY_BANK[classifyIdx];
+  $('classifySituation').textContent = item.situation;
+  const opts = shuffle(["폴더 구조 활용","메타데이터 활용"]);
+  const wrap=$('classifyChoices'); wrap.innerHTML='';
+  classifySelected=null;
+  opts.forEach(o=>{
+    const btn=document.createElement('button');
+    btn.className='choice-btn'; btn.type='button'; btn.textContent=o;
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('#classifyChoices .choice-btn').forEach(b=>b.classList.remove('selected'));
+      btn.classList.add('selected'); classifySelected=o;
+    });
+    wrap.appendChild(btn);
+  });
+  $('classifyFeedback').textContent=''; $('classifyFeedback').className='feedback';
+}
+function checkClassify(){
+  if(!classifySelected){ showFeedback('classifyFeedback', false, '선택지를 하나 골라주세요.'); return; }
+  const item = CLASSIFY_BANK[classifyIdx];
+  const correct = classifySelected===item.answer;
+  document.querySelectorAll('#classifyChoices .choice-btn').forEach(b=>{
+    if(b.textContent===item.answer) b.classList.add('correct');
+    else if(b.textContent===classifySelected && !correct) b.classList.add('wrong');
+  });
+  showFeedback('classifyFeedback', correct, correct?'':('정답: '+item.answer));
+  recordAnswer(correct);
+}
+
+/* ============ MODULE 4B : 폴더 배치 게임 ============ */
+const FOLDER_OPTIONS=["가족","학교","동아리"];
+const FOLDER_ITEM_POOL=[
+  {text:"가족 여행 사진 (2023.08, 부산)", answer:"가족"},
+  {text:"수학 수업 필기 정리 파일", answer:"학교"},
+  {text:"댄스 동아리 공연 영상", answer:"동아리"},
+  {text:"동생 생일파티 사진", answer:"가족"},
+  {text:"과학 실험 보고서", answer:"학교"},
+  {text:"독서 동아리 토론 기록", answer:"동아리"},
+  {text:"할머니 생신 모임 사진", answer:"가족"},
+  {text:"국어 수행평가 발표자료", answer:"학교"},
+  {text:"봉사 동아리 활동 일지", answer:"동아리"}
+];
+let folderItems=[], folderChoices={};
+function nextFolderGame(){
+  folderItems = shuffle(FOLDER_ITEM_POOL).slice(0,5);
+  folderChoices = {};
+  const wrap=$('folderGame'); wrap.innerHTML='';
+  folderItems.forEach((item,i)=>{
+    const row=document.createElement('div'); row.className='folder-item';
+    const btnsHtml = FOLDER_OPTIONS.map(f=>`<button type="button" class="folder-btn" data-i="${i}" data-f="${f}">${f}</button>`).join('');
+    row.innerHTML = `<div class="txt">${item.text}</div><div class="folder-btns">${btnsHtml}</div>`;
+    wrap.appendChild(row);
+  });
+  wrap.querySelectorAll('.folder-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const i=btn.dataset.i;
+      wrap.querySelectorAll(`.folder-btn[data-i="${i}"]`).forEach(b=>b.classList.remove('chosen','right','wrongc'));
+      btn.classList.add('chosen');
+      folderChoices[i]=btn.dataset.f;
+    });
+  });
+  $('folderFeedback').textContent=''; $('folderFeedback').className='feedback';
+}
+function checkFolderGame(){
+  let allCorrect=true, answeredAll=true;
+  folderItems.forEach((item,i)=>{
+    if(!folderChoices[i]){ answeredAll=false; return; }
+    const ok = folderChoices[i]===item.answer;
+    if(!ok) allCorrect=false;
+    document.querySelectorAll(`.folder-btn[data-i="${i}"]`).forEach(b=>{
+      if(b.dataset.f===item.answer) b.classList.add('right');
+      else if(b.dataset.f===folderChoices[i]) b.classList.add('wrongc');
+    });
+    recordAnswer(ok);
+  });
+  if(!answeredAll){ showFeedback('folderFeedback', false, '모든 항목에 폴더를 선택해주세요.'); return; }
+  showFeedback('folderFeedback', allCorrect, allCorrect?'':'빨간색으로 표시된 항목을 다시 확인해보세요.');
+}
+
+/* ============ MODULE 5 : 실습해보기 ============ */
+const PRACTICUM_STEPS=[
+  "사이트에 접속해 '기후통계분석 > 기온분석' 메뉴로 이동했다.",
+  "관측지점을 우리 지역(또는 가까운 지역)으로 선택했다.",
+  "기간을 10년 전(예: 2015년)으로 설정하고 연평균기온을 검색했다.",
+  "결과 화면을 캡처했다.",
+  "같은 방법으로 올해(예: 2025년) 연평균기온을 검색하고 캡처했다.",
+  "두 시점의 평균기온을 비교해 변화를 확인했다."
+];
+function buildPracticumChecklist(){
+  const wrap=$('practicumChecklist'); wrap.innerHTML='';
+  PRACTICUM_STEPS.forEach((s,i)=>{
+    const label=document.createElement('label');
+    label.innerHTML = `<input type="checkbox" data-step="${i}"><span>${s}</span>`;
+    wrap.appendChild(label);
+  });
+  wrap.querySelectorAll('input').forEach(cb=>cb.addEventListener('change', updateProgress));
+}
+function updateProgress(){
+  const boxes = document.querySelectorAll('#practicumChecklist input');
+  const checked = document.querySelectorAll('#practicumChecklist input:checked').length;
+  const pct = Math.round((checked/boxes.length)*100);
+  $('progressBar').style.width = pct+'%';
+  $('progressPct').textContent = pct+'%';
+}
+buildPracticumChecklist();
+
+/* ---- image capture upload + preview (file select or clipboard paste) ---- */
+function loadImageFile(file, previewId, placeholderId){
+  if(!file) return;
+  const preview=$(previewId), placeholder=$(placeholderId);
+  const reader=new FileReader();
+  reader.onload = e=>{
+    preview.src = e.target.result;
+    preview.style.display='block';
+    placeholder.style.display='none';
+  };
+  reader.readAsDataURL(file);
+}
+function bindCaptureUpload(inputId, previewId, placeholderId){
+  const input=$(inputId);
+  input.addEventListener('change', ()=>{
+    loadImageFile(input.files && input.files[0], previewId, placeholderId);
+  });
+}
+bindCaptureUpload('img1Input','img1Preview','img1Placeholder');
+bindCaptureUpload('img2Input','img2Preview','img2Placeholder');
+
+let activeCaptureTarget='1';
+[['img1Drop','img1Browse','img1Input','1'], ['img2Drop','img2Browse','img2Input','2']].forEach(([dropId, browseId, inputId, num])=>{
+  const drop=$(dropId);
+  drop.addEventListener('click', ()=>{
+    activeCaptureTarget = num;
+    document.querySelectorAll('.upload-drop').forEach(el=>el.classList.remove('target-active'));
+    drop.classList.add('target-active');
+    drop.focus();
+  });
+  drop.addEventListener('focus', ()=>{ activeCaptureTarget = num; });
+  $(browseId).addEventListener('click', (e)=>{
+    e.stopPropagation();
+    activeCaptureTarget = num;
+    $(inputId).click();
+  });
+});
+document.addEventListener('paste', (e)=>{
+  const activeEl = document.activeElement;
+  const withinDropZone = activeEl && (activeEl.id==='img1Drop' || activeEl.id==='img2Drop');
+  if(!withinDropZone) return;
+  const items = e.clipboardData && e.clipboardData.items;
+  if(!items) return;
+  for(const item of items){
+    if(item.type.indexOf('image')===0){
+      const file = item.getAsFile();
+      if(activeCaptureTarget==='1') loadImageFile(file, 'img1Preview', 'img1Placeholder');
+      else loadImageFile(file, 'img2Preview', 'img2Placeholder');
+      e.preventDefault();
+      break;
+    }
+  }
+});
+
+/* ---- build a self-contained submission PDF (browser print, no external libs) ---- */
+function setSubmitStatus(msg, isError){
+  const el=$('submitFeedback');
+  el.textContent = msg;
+  el.className = 'feedback ' + (isError ? 'bad' : 'good');
+}
+
+/* ---- minimal PDF writer (no external libraries): embeds JPEG canvases as full-bleed pages ---- */
+function dataUrlToBytes(dataUrl){
+  const base64 = dataUrl.split(',')[1];
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for(let i=0;i<binary.length;i++) bytes[i] = binary.charCodeAt(i);
+  return bytes;
+}
+function buildPdfBytes(pages){
+  const enc = new TextEncoder();
+  let offset = 0;
+  const parts = [];
+  const objOffsets = {};
+  function push(strOrBytes){
+    const bytes = (typeof strOrBytes === 'string') ? enc.encode(strOrBytes) : strOrBytes;
+    parts.push(bytes);
+    offset += bytes.length;
+  }
+  push('%PDF-1.4\n');
+  push(new Uint8Array([0x25,0xE2,0xE3,0xCF,0xD3,0x0A]));
+
+  const N = pages.length;
+  const pageObjNums = [];
+  for(let k=0;k<N;k++){
+    const pageObjNum = 3 + k*3, contentObjNum = 4 + k*3, imageObjNum = 5 + k*3;
+    pageObjNums.push(pageObjNum);
+    const p = pages[k];
+    const contentStr = `q\n${p.pageWidthPt.toFixed(2)} 0 0 ${p.pageHeightPt.toFixed(2)} 0 0 cm\n/Im0 Do\nQ`;
+    const contentBytes = enc.encode(contentStr);
+
+    objOffsets[pageObjNum] = offset;
+    push(`${pageObjNum} 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${p.pageWidthPt.toFixed(2)} ${p.pageHeightPt.toFixed(2)}] /Resources << /XObject << /Im0 ${imageObjNum} 0 R >> >> /Contents ${contentObjNum} 0 R >>\nendobj\n`);
+
+    objOffsets[contentObjNum] = offset;
+    push(`${contentObjNum} 0 obj\n<< /Length ${contentBytes.length} >>\nstream\n`);
+    push(contentBytes);
+    push('\nendstream\nendobj\n');
+
+    objOffsets[imageObjNum] = offset;
+    push(`${imageObjNum} 0 obj\n<< /Type /XObject /Subtype /Image /Width ${p.width} /Height ${p.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${p.jpegBytes.length} >>\nstream\n`);
+    push(p.jpegBytes);
+    push('\nendstream\nendobj\n');
+  }
+
+  objOffsets[2] = offset;
+  push(`2 0 obj\n<< /Type /Pages /Kids [ ${pageObjNums.map(n=>n+' 0 R').join(' ')} ] /Count ${N} >>\nendobj\n`);
+  objOffsets[1] = offset;
+  push(`1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n`);
+
+  const xrefStart = offset;
+  const maxObjNum = 2 + 3*N;
+  let xref = `xref\n0 ${maxObjNum+1}\n0000000000 65535 f \n`;
+  for(let num=1; num<=maxObjNum; num++){
+    xref += `${String(objOffsets[num]).padStart(10,'0')} 00000 n \n`;
+  }
+  push(xref);
+  push(`trailer\n<< /Size ${maxObjNum+1} /Root 1 0 R >>\nstartxref\n${xrefStart}\n%%EOF`);
+
+  const total = parts.reduce((s,p)=>s+p.length,0);
+  const result = new Uint8Array(total);
+  let pos=0;
+  for(const p of parts){ result.set(p,pos); pos+=p.length; }
+  return result;
+}
+function canvasToPdfPage(canvas){
+  const jpegBytes = dataUrlToBytes(canvas.toDataURL('image/jpeg', 0.9));
+  const PT_PER_PX = 0.75;
+  return {
+    jpegBytes, width: canvas.width, height: canvas.height,
+    pageWidthPt: canvas.width*PT_PER_PX, pageHeightPt: canvas.height*PT_PER_PX
+  };
+}
+
+/* ---- draw each section onto its own canvas using plain Canvas 2D (no DOM rendering libs) ---- */
+function wrapCanvasText(ctx, text, maxWidth){
+  const paragraphs = text.split('\n');
+  const lines = [];
+  paragraphs.forEach(para=>{
+    if(para===''){ lines.push(''); return; }
+    let line='';
+    for(const ch of para){
+      const test = line+ch;
+      if(ctx.measureText(test).width > maxWidth && line!==''){
+        lines.push(line);
+        line = ch;
+      }else{
+        line = test;
+      }
+    }
+    lines.push(line);
+  });
+  return lines;
+}
+function buildImagePageCanvas(title, meta, label, imgEl){
+  const W=1000, margin=48;
+  const availW = W - margin*2;
+  const scale = availW / imgEl.naturalWidth;
+  const imgW = availW, imgH = imgEl.naturalHeight*scale;
+  const titleH = title ? 40 : 0;
+  const metaH = meta ? 26 : 0;
+  const labelH = 34;
+  const topH = margin + titleH + metaH + labelH;
+  const canvas = document.createElement('canvas');
+  canvas.width = W;
+  canvas.height = topH + imgH + margin;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,canvas.width,canvas.height);
+  let y = margin;
+  if(title){
+    ctx.fillStyle='#1F2430'; ctx.font='700 26px "IBM Plex Sans KR", sans-serif';
+    ctx.fillText(title, margin, y+24);
+    y += titleH;
+  }
+  if(meta){
+    ctx.fillStyle='#6B7280'; ctx.font='400 15px "IBM Plex Sans KR", sans-serif';
+    ctx.fillText(meta, margin, y+16);
+    y += metaH;
+  }
+  ctx.fillStyle='#1F2430'; ctx.font='600 18px "IBM Plex Sans KR", sans-serif';
+  ctx.fillText(label, margin, y+22);
+  y += labelH;
+  ctx.drawImage(imgEl, margin, y, imgW, imgH);
+  ctx.strokeStyle='#E3E6F0'; ctx.lineWidth=2;
+  ctx.strokeRect(margin, y, imgW, imgH);
+  return canvas;
+}
+function buildTextPageCanvas(label, text){
+  const W=1000, margin=48, boxPad=22, lineHeight=26;
+  const canvas0 = document.createElement('canvas');
+  const ctx0 = canvas0.getContext('2d');
+  ctx0.font='16px "IBM Plex Sans KR", sans-serif';
+  const maxTextWidth = (W - margin*2) - boxPad*2;
+  const lines = wrapCanvasText(ctx0, text, maxTextWidth);
+  const labelH=44;
+  const boxH = lines.length*lineHeight + boxPad*2;
+  const canvas = document.createElement('canvas');
+  canvas.width = W;
+  canvas.height = margin + labelH + boxH + margin;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle='#1F2430'; ctx.font='600 18px "IBM Plex Sans KR", sans-serif';
+  ctx.fillText(label, margin, margin+22);
+  const boxY = margin+labelH;
+  ctx.fillStyle='#F5F6FB'; ctx.fillRect(margin, boxY, W-margin*2, boxH);
+  ctx.strokeStyle='#E3E6F0'; ctx.lineWidth=2; ctx.strokeRect(margin, boxY, W-margin*2, boxH);
+  ctx.fillStyle='#1F2430'; ctx.font='16px "IBM Plex Sans KR", sans-serif';
+  lines.forEach((line,i)=>{ ctx.fillText(line, margin+boxPad, boxY+boxPad+18+i*lineHeight); });
+  return canvas;
+}
+
+function escapeHtml(str){
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+async function buildSubmissionFile(){
+  const name = $('studentNameInput').value.trim();
+  const img1El = $('img1Preview');
+  const img2El = $('img2Preview');
+  const analysis = $('analysisText').value.trim();
+
+  if(!name){ setSubmitStatus('이름을 입력해주세요.', true); return; }
+  if(img1El.style.display==='none'){ setSubmitStatus('10년 전 캡처 이미지를 첨부해주세요.', true); return; }
+  if(img2El.style.display==='none'){ setSubmitStatus('올해 캡처 이미지를 첨부해주세요.', true); return; }
+  if(!analysis){ setSubmitStatus('분석 결과를 작성해주세요.', true); return; }
+
+  setSubmitStatus('PDF를 만드는 중이에요. 잠시만 기다려주세요...', false);
+
+  try{
+    if(document.fonts && document.fonts.ready){ await document.fonts.ready; }
+
+    const meta = `제출자: ${name} · 제출일: ${new Date().toLocaleString('ko-KR')}`;
+    const page1 = buildImagePageCanvas('🌡️ 기온 변화 조사 제출', meta, '10년 전 캡처', img1El);
+    const page2 = buildImagePageCanvas(null, null, '올해 캡처', img2El);
+    const page3 = buildTextPageCanvas('분석 결과', analysis);
+
+    const pdfBytes = buildPdfBytes([page1, page2, page3].map(canvasToPdfPage));
+    const blob = new Blob([pdfBytes], {type:'application/pdf'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `기온변화_제출_${name}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    setSubmitStatus('PDF 파일이 다운로드되었어요. 안내된 방법으로 업로드해서 제출을 완료해주세요.', false);
+  }catch(err){
+    setSubmitStatus('PDF 생성 중 문제가 발생했어요. 페이지를 새로고침한 뒤 다시 시도해주세요.', true);
+  }
+}
+
+/* ============ init ============ */
+nextImportance();
+nextMethod();
+nextSearch();
+nextCriteria();
+nextClassify();
+nextFolderGame();
+</script>
+</body>
+</html>
