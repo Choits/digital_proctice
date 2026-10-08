@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>인공지능의 이해와 활용 · 학습지</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F5F6FB;
+    --bg-grad: radial-gradient(circle at 15% 0%, #EEF0FF 0%, #F5F6FB 45%), radial-gradient(circle at 85% 100%, #FCEEF3 0%, #F5F6FB 55%);
+    --panel:#FFFFFF;
+    --panel-alt:#F1F2F9;
+    --border:#E3E6F0;
+    --border-soft:#EBEDF5;
+    --text:#1F2430;
+    --muted:#6B7280;
+    --ink:#151A24;
+    --accent:#6D5DFB;
+    --accent-dim:rgba(109,93,251,.10);
+    --violet:#6D5DFB; --violet-dim:rgba(109,93,251,.10);
+    --amber:#E2A93F; --amber-dim:rgba(226,169,63,.12);
+    --teal:#0EA895; --teal-dim:rgba(14,168,149,.10);
+    --rose:#E24F82; --rose-dim:rgba(226,79,130,.10);
+    --sky:#2F8FE0; --sky-dim:rgba(47,143,224,.10);
+    --danger:#E1483F;
+    --good:#0EA895;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg-grad); background-color:var(--bg); color:var(--text);
+    font-family:'IBM Plex Sans KR', sans-serif; line-height:1.6; padding-bottom:70px; min-height:100vh;
+  }
+  .mono{font-family:'IBM Plex Mono', monospace;}
+  a{color:inherit;}
+  img{max-width:100%;}
+
+  /* top bar */
+  .topbar{
+    position:sticky; top:0; z-index:40; background:rgba(255,255,255,.88); backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--border); padding:12px 20px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+  }
+  .topbar .left{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .home-link{
+    font-size:13px; font-weight:600; color:var(--muted); text-decoration:none; display:flex; align-items:center; gap:5px;
+    padding:6px 10px; border-radius:999px; border:1px solid var(--border); background:var(--panel);
+  }
+  .home-link:hover{color:var(--text); border-color:var(--border-soft);}
+  .lesson-pill{
+    font-family:'IBM Plex Mono', monospace; font-size:12px; font-weight:700; color:#fff;
+    background:var(--accent); padding:6px 12px; border-radius:999px;
+  }
+  .scoreboard{
+    background:var(--panel); border:1px solid var(--border); border-radius:999px;
+    padding:7px 15px; display:flex; align-items:center; gap:7px; font-size:13px; box-shadow:0 2px 8px rgba(31,36,48,.05);
+  }
+  .scoreboard #scoreText{color:var(--accent); font-weight:700; font-size:14px;}
+  .scoreboard .score-label{color:var(--muted);}
+
+  /* hero */
+  .hero{max-width:920px; margin:0 auto; padding:44px 24px 20px;}
+  .eyebrow{font-family:'IBM Plex Mono', monospace; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); font-size:12px; margin-bottom:10px;}
+  .hero h1{font-size:clamp(24px,4vw,36px); margin:0 0 10px; font-weight:700; letter-spacing:-.01em;}
+  .hero p{color:var(--muted); font-size:14.5px; max-width:640px; margin:0;}
+
+  main{max-width:920px; margin:0 auto; padding:18px 24px 10px;}
+
+  section.block{margin-bottom:34px;}
+  .block-head{display:flex; align-items:center; gap:10px; margin-bottom:14px;}
+  .block-head .dot{width:9px; height:9px; border-radius:50%; background:var(--accent); flex:none;}
+  .block-head h2{font-size:18px; margin:0;}
+
+  .goal-box{
+    background:var(--accent-dim); border:1px solid var(--border); border-left:4px solid var(--accent);
+    border-radius:12px; padding:16px 20px; margin-bottom:30px; font-size:14px;
+  }
+  .goal-box b{display:block; font-size:12.5px; color:var(--accent); margin-bottom:6px; letter-spacing:.02em;}
+  .goal-box ul{margin:0; padding-left:18px;}
+  .goal-box li{margin-bottom:3px;}
+
+  .concept-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-bottom:8px;}
+  @media (max-width:640px){.concept-grid{grid-template-columns:1fr;}}
+  .concept-card{background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:16px 18px; box-shadow:0 1px 3px rgba(31,36,48,.04);}
+  .concept-card h4{margin:0 0 6px; font-size:14px; display:flex; align-items:center; gap:7px;}
+  .concept-card p{margin:0; font-size:12.8px; color:var(--muted); line-height:1.65;}
+
+  .card{background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:22px; margin-bottom:16px; box-shadow:0 1px 3px rgba(31,36,48,.05);}
+  .card-label{font-size:13px; color:var(--muted); font-weight:600; margin-bottom:12px; letter-spacing:.01em;}
+  .prompt-box{background:var(--panel-alt); border-radius:12px; padding:16px 18px; margin-bottom:14px; font-size:14.5px; line-height:1.65;}
+
+  .choice-list{display:flex; flex-direction:column; gap:8px; margin-bottom:14px;}
+  .choice-btn{
+    text-align:left; background:var(--bg); border:1px solid var(--border); color:var(--text);
+    border-radius:10px; padding:12px 14px; font-size:14px; cursor:pointer; font-family:inherit;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .choice-btn:hover{border-color:var(--border-soft);}
+  .choice-btn.selected{border-color:var(--accent); background:var(--accent-dim);}
+  .choice-btn.correct{border-color:var(--good); background:var(--teal-dim); color:var(--good);}
+  .choice-btn.wrong{border-color:var(--danger); background:rgba(225,72,63,.08); color:var(--danger);}
+
+  button{
+    font-family:'IBM Plex Sans KR', sans-serif; font-weight:600; font-size:14px;
+    background:var(--accent); color:#fff; border:none; border-radius:10px;
+    padding:11px 18px; cursor:pointer; transition:transform .12s ease;
+  }
+  button:hover{transform:translateY(-1px);}
+  button.ghost{background:transparent; color:var(--muted); border:1px solid var(--border); margin-top:10px; width:100%;}
+  button.ghost:hover{color:var(--text); border-color:var(--border-soft);}
+  button.block{width:100%;}
+  button.outline{background:var(--panel); color:var(--accent); border:1px solid var(--accent);}
+
+  .feedback{min-height:20px; margin-top:8px; font-size:13.5px; font-weight:600;}
+  .feedback.good{color:var(--good);}
+  .feedback.bad{color:var(--danger);}
+
+  .ox-row{display:flex; gap:10px; margin-bottom:14px;}
+  .ox-btn{flex:1; padding:13px; border-radius:10px; border:1px solid var(--border); background:var(--bg); color:var(--text); font-weight:700; cursor:pointer;}
+  .ox-btn.selected{border-color:var(--accent); background:var(--accent-dim); color:var(--accent);}
+  .ox-btn.correct{border-color:var(--good); background:var(--teal-dim); color:var(--good);}
+  .ox-btn.wrong{border-color:var(--danger); background:rgba(225,72,63,.08); color:var(--danger);}
+
+  textarea{
+    width:100%; min-height:84px; background:var(--bg); border:1px solid var(--border); color:var(--text);
+    border-radius:10px; padding:12px 14px; font-family:'IBM Plex Sans KR',sans-serif; font-size:13.5px; resize:vertical;
+  }
+  input[type="text"]{
+    background:var(--bg); border:1px solid var(--border); color:var(--text);
+    border-radius:10px; padding:11px 13px; font-size:14px; font-family:inherit; outline:none; width:100%;
+  }
+  input[type="text"]:focus{border-color:var(--accent);}
+
+  .ext-link-row{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;}
+  .ext-link{
+    display:inline-flex; align-items:center; gap:7px; background:var(--panel); border:1px solid var(--border);
+    border-radius:10px; padding:10px 15px; font-size:13.5px; font-weight:600; text-decoration:none; color:var(--text);
+  }
+  .ext-link:hover{border-color:var(--accent); color:var(--accent);}
+
+  .video-wrap{position:relative; width:100%; padding-top:56.25%; border-radius:12px; overflow:hidden; background:#000; margin-bottom:10px;}
+  .video-wrap iframe{position:absolute; inset:0; width:100%; height:100%; border:0;}
+
+  .step-list{counter-reset:stepnum; margin:0 0 16px; padding:0; list-style:none;}
+  .step-list li{
+    counter-increment:stepnum; position:relative; padding:12px 14px 12px 44px; background:var(--bg);
+    border:1px solid var(--border); border-radius:10px; margin-bottom:8px; font-size:13.8px;
+  }
+  .step-list li::before{
+    content:counter(stepnum); position:absolute; left:12px; top:50%; transform:translateY(-50%);
+    width:22px; height:22px; border-radius:50%; background:var(--accent); color:#fff; font-size:12px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+  }
+
+  /* bottom nav */
+  .lesson-nav{max-width:920px; margin:46px auto 0; padding:0 24px; display:flex; gap:12px; justify-content:space-between; flex-wrap:wrap;}
+  .nav-btn{
+    flex:1; min-width:160px; background:var(--panel); border:1px solid var(--border); border-radius:14px;
+    padding:16px 18px; text-decoration:none; color:var(--text); display:flex; flex-direction:column; gap:4px;
+    box-shadow:0 1px 3px rgba(31,36,48,.05); transition:border-color .15s ease;
+  }
+  .nav-btn:hover{border-color:var(--accent);}
+  .nav-btn .nav-label{font-size:11.5px; color:var(--muted); font-weight:600;}
+  .nav-btn .nav-title{font-size:14px; font-weight:700;}
+  .nav-btn.next{text-align:right; align-items:flex-end;}
+  .nav-btn.disabled{opacity:.4; pointer-events:none;}
+
+  /* index page specific */
+  .lesson-card{
+    display:flex; gap:16px; align-items:center; background:var(--panel); border:1px solid var(--border);
+    border-radius:16px; padding:20px 22px; text-decoration:none; color:var(--text); margin-bottom:12px;
+    box-shadow:0 1px 3px rgba(31,36,48,.05); transition:transform .15s ease, border-color .15s ease;
+  }
+  .lesson-card:hover{transform:translateY(-2px); border-color:var(--lesson-accent, var(--violet));}
+  .lesson-card .num{
+    width:46px; height:46px; border-radius:50%; background:var(--lesson-accent, var(--violet)); color:#fff;
+    display:flex; align-items:center; justify-content:center; font-weight:700; font-size:17px; flex:none;
+  }
+  .lesson-card .info{flex:1;}
+  .lesson-card .code{font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--muted); margin-bottom:2px;}
+  .lesson-card .ltitle{font-size:16px; font-weight:700; margin-bottom:3px;}
+  .lesson-card .lsub{font-size:12.8px; color:var(--muted);}
+  .lesson-card .arrow{font-size:20px; color:var(--muted); flex:none;}
+
+  .index-hero{max-width:760px; margin:0 auto; padding:64px 24px 10px; text-align:center;}
+  .index-hero h1{font-size:clamp(28px,5vw,42px); margin:0 0 14px;}
+  .index-hero p{color:var(--muted); font-size:15px; max-width:520px; margin:0 auto;}
+  .lesson-list{max-width:760px; margin:40px auto 0; padding:0 24px;}
+</style>
+</head>
+<body>
+
+  <header class="index-hero">
+    <div class="eyebrow">Ⅳ단원 · 인공지능</div>
+    <h1>🤖 인공지능의 이해와 활용</h1>
+    <p>5개의 차시를 순서대로 학습하며 개념을 익히고, 실습과 확인 문제로 복습해보세요. 각 차시 끝에서 다음 차시로 자동으로 이동할 수 있어요.</p>
+  </header>
+
+  <div class="lesson-list">
+
+      <a class="lesson-card" style="--lesson-accent:#6D5DFB;" href="lesson1.html">
+        <div class="num">1</div>
+        <div class="info">
+          <div class="code">Ⅳ-1-01</div>
+          <div class="ltitle">인공지능의 탄생</div>
+          <div class="lsub">인공지능의 개념과 특성, 시스템의 구성 원리와 활용 분야를 알아봐요.</div>
+        </div>
+        <div class="arrow">→</div>
+      </a>
+
+      <a class="lesson-card" style="--lesson-accent:#E2A93F;" href="lesson2.html">
+        <div class="num">2</div>
+        <div class="info">
+          <div class="code">Ⅳ-1-02</div>
+          <div class="ltitle">일반 SW vs 인공지능 SW</div>
+          <div class="lsub">일반 소프트웨어와 인공지능 소프트웨어를 구별하는 연습을 해봐요.</div>
+        </div>
+        <div class="arrow">→</div>
+      </a>
+
+      <a class="lesson-card" style="--lesson-accent:#0EA895;" href="lesson3.html">
+        <div class="num">3</div>
+        <div class="info">
+          <div class="code">Ⅳ-2-01</div>
+          <div class="ltitle">인간과 인공지능의 협력</div>
+          <div class="lsub">인공지능 학습에서 데이터가 왜 중요한지 알아봐요.</div>
+        </div>
+        <div class="arrow">→</div>
+      </a>
+
+      <a class="lesson-card" style="--lesson-accent:#E24F82;" href="lesson4.html">
+        <div class="num">4</div>
+        <div class="info">
+          <div class="code">Ⅳ-2-02</div>
+          <div class="ltitle">AI 시스템으로 문제 해결</div>
+          <div class="lsub">이미지·소리·텍스트 데이터로 문제를 해결하는 방법을 연습해요.</div>
+        </div>
+        <div class="arrow">→</div>
+      </a>
+
+      <a class="lesson-card" style="--lesson-accent:#2F8FE0;" href="lesson5.html">
+        <div class="num">5</div>
+        <div class="info">
+          <div class="code">Ⅳ-2-03</div>
+          <div class="ltitle">인공지능 윤리</div>
+          <div class="lsub">데이터 편향과 인공지능 윤리 문제를 생각해봐요.</div>
+        </div>
+        <div class="arrow">→</div>
+      </a>
+  </div>
+
+  <div class="lesson-nav" style="margin-top:40px;">
+    <a class="nav-btn next" href="lesson1.html" style="margin:0 auto; text-align:center; align-items:center;">
+      <span class="nav-label">학습 시작하기</span>
+      <span class="nav-title">1차시부터 시작하기 →</span>
+    </a>
+  </div>
+
+</body>
+</html>

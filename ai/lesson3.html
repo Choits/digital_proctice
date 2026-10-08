@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3차시 · 인간과 인공지능의 협력 · 인공지능 학습지</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F5F6FB;
+    --bg-grad: radial-gradient(circle at 15% 0%, #EEF0FF 0%, #F5F6FB 45%), radial-gradient(circle at 85% 100%, #FCEEF3 0%, #F5F6FB 55%);
+    --panel:#FFFFFF;
+    --panel-alt:#F1F2F9;
+    --border:#E3E6F0;
+    --border-soft:#EBEDF5;
+    --text:#1F2430;
+    --muted:#6B7280;
+    --ink:#151A24;
+    --accent:#0EA895;
+    --accent-dim:rgba(14,168,149,.10);
+    --violet:#6D5DFB; --violet-dim:rgba(109,93,251,.10);
+    --amber:#E2A93F; --amber-dim:rgba(226,169,63,.12);
+    --teal:#0EA895; --teal-dim:rgba(14,168,149,.10);
+    --rose:#E24F82; --rose-dim:rgba(226,79,130,.10);
+    --sky:#2F8FE0; --sky-dim:rgba(47,143,224,.10);
+    --danger:#E1483F;
+    --good:#0EA895;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg-grad); background-color:var(--bg); color:var(--text);
+    font-family:'IBM Plex Sans KR', sans-serif; line-height:1.6; padding-bottom:70px; min-height:100vh;
+  }
+  .mono{font-family:'IBM Plex Mono', monospace;}
+  a{color:inherit;}
+  img{max-width:100%;}
+
+  /* top bar */
+  .topbar{
+    position:sticky; top:0; z-index:40; background:rgba(255,255,255,.88); backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--border); padding:12px 20px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+  }
+  .topbar .left{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .home-link{
+    font-size:13px; font-weight:600; color:var(--muted); text-decoration:none; display:flex; align-items:center; gap:5px;
+    padding:6px 10px; border-radius:999px; border:1px solid var(--border); background:var(--panel);
+  }
+  .home-link:hover{color:var(--text); border-color:var(--border-soft);}
+  .lesson-pill{
+    font-family:'IBM Plex Mono', monospace; font-size:12px; font-weight:700; color:#fff;
+    background:var(--accent); padding:6px 12px; border-radius:999px;
+  }
+  .scoreboard{
+    background:var(--panel); border:1px solid var(--border); border-radius:999px;
+    padding:7px 15px; display:flex; align-items:center; gap:7px; font-size:13px; box-shadow:0 2px 8px rgba(31,36,48,.05);
+  }
+  .scoreboard #scoreText{color:var(--accent); font-weight:700; font-size:14px;}
+  .scoreboard .score-label{color:var(--muted);}
+
+  /* hero */
+  .hero{max-width:920px; margin:0 auto; padding:44px 24px 20px;}
+  .eyebrow{font-family:'IBM Plex Mono', monospace; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); font-size:12px; margin-bottom:10px;}
+  .hero h1{font-size:clamp(24px,4vw,36px); margin:0 0 10px; font-weight:700; letter-spacing:-.01em;}
+  .hero p{color:var(--muted); font-size:14.5px; max-width:640px; margin:0;}
+
+  main{max-width:920px; margin:0 auto; padding:18px 24px 10px;}
+
+  section.block{margin-bottom:34px;}
+  .block-head{display:flex; align-items:center; gap:10px; margin-bottom:14px;}
+  .block-head .dot{width:9px; height:9px; border-radius:50%; background:var(--accent); flex:none;}
+  .block-head h2{font-size:18px; margin:0;}
+
+  .goal-box{
+    background:var(--accent-dim); border:1px solid var(--border); border-left:4px solid var(--accent);
+    border-radius:12px; padding:16px 20px; margin-bottom:30px; font-size:14px;
+  }
+  .goal-box b{display:block; font-size:12.5px; color:var(--accent); margin-bottom:6px; letter-spacing:.02em;}
+  .goal-box ul{margin:0; padding-left:18px;}
+  .goal-box li{margin-bottom:3px;}
+
+  .concept-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-bottom:8px;}
+  @media (max-width:640px){.concept-grid{grid-template-columns:1fr;}}
+  .concept-card{background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:16px 18px; box-shadow:0 1px 3px rgba(31,36,48,.04);}
+  .concept-card h4{margin:0 0 6px; font-size:14px; display:flex; align-items:center; gap:7px;}
+  .concept-card p{margin:0; font-size:12.8px; color:var(--muted); line-height:1.65;}
+
+  .card{background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:22px; margin-bottom:16px; box-shadow:0 1px 3px rgba(31,36,48,.05);}
+  .card-label{font-size:13px; color:var(--muted); font-weight:600; margin-bottom:12px; letter-spacing:.01em;}
+  .prompt-box{background:var(--panel-alt); border-radius:12px; padding:16px 18px; margin-bottom:14px; font-size:14.5px; line-height:1.65;}
+
+  .choice-list{display:flex; flex-direction:column; gap:8px; margin-bottom:14px;}
+  .choice-btn{
+    text-align:left; background:var(--bg); border:1px solid var(--border); color:var(--text);
+    border-radius:10px; padding:12px 14px; font-size:14px; cursor:pointer; font-family:inherit;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .choice-btn:hover{border-color:var(--border-soft);}
+  .choice-btn.selected{border-color:var(--accent); background:var(--accent-dim);}
+  .choice-btn.correct{border-color:var(--good); background:var(--teal-dim); color:var(--good);}
+  .choice-btn.wrong{border-color:var(--danger); background:rgba(225,72,63,.08); color:var(--danger);}
+
+  button{
+    font-family:'IBM Plex Sans KR', sans-serif; font-weight:600; font-size:14px;
+    background:var(--accent); color:#fff; border:none; border-radius:10px;
+    padding:11px 18px; cursor:pointer; transition:transform .12s ease;
+  }
+  button:hover{transform:translateY(-1px);}
+  button.ghost{background:transparent; color:var(--muted); border:1px solid var(--border); margin-top:10px; width:100%;}
+  button.ghost:hover{color:var(--text); border-color:var(--border-soft);}
+  button.block{width:100%;}
+  button.outline{background:var(--panel); color:var(--accent); border:1px solid var(--accent);}
+
+  .feedback{min-height:20px; margin-top:8px; font-size:13.5px; font-weight:600;}
+  .feedback.good{color:var(--good);}
+  .feedback.bad{color:var(--danger);}
+
+  .ox-row{display:flex; gap:10px; margin-bottom:14px;}
+  .ox-btn{flex:1; padding:13px; border-radius:10px; border:1px solid var(--border); background:var(--bg); color:var(--text); font-weight:700; cursor:pointer;}
+  .ox-btn.selected{border-color:var(--accent); background:var(--accent-dim); color:var(--accent);}
+  .ox-btn.correct{border-color:var(--good); background:var(--teal-dim); color:var(--good);}
+  .ox-btn.wrong{border-color:var(--danger); background:rgba(225,72,63,.08); color:var(--danger);}
+
+  textarea{
+    width:100%; min-height:84px; background:var(--bg); border:1px solid var(--border); color:var(--text);
+    border-radius:10px; padding:12px 14px; font-family:'IBM Plex Sans KR',sans-serif; font-size:13.5px; resize:vertical;
+  }
+  input[type="text"]{
+    background:var(--bg); border:1px solid var(--border); color:var(--text);
+    border-radius:10px; padding:11px 13px; font-size:14px; font-family:inherit; outline:none; width:100%;
+  }
+  input[type="text"]:focus{border-color:var(--accent);}
+
+  .ext-link-row{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;}
+  .ext-link{
+    display:inline-flex; align-items:center; gap:7px; background:var(--panel); border:1px solid var(--border);
+    border-radius:10px; padding:10px 15px; font-size:13.5px; font-weight:600; text-decoration:none; color:var(--text);
+  }
+  .ext-link:hover{border-color:var(--accent); color:var(--accent);}
+
+  .video-wrap{position:relative; width:100%; padding-top:56.25%; border-radius:12px; overflow:hidden; background:#000; margin-bottom:10px;}
+  .video-wrap iframe{position:absolute; inset:0; width:100%; height:100%; border:0;}
+
+  .step-list{counter-reset:stepnum; margin:0 0 16px; padding:0; list-style:none;}
+  .step-list li{
+    counter-increment:stepnum; position:relative; padding:12px 14px 12px 44px; background:var(--bg);
+    border:1px solid var(--border); border-radius:10px; margin-bottom:8px; font-size:13.8px;
+  }
+  .step-list li::before{
+    content:counter(stepnum); position:absolute; left:12px; top:50%; transform:translateY(-50%);
+    width:22px; height:22px; border-radius:50%; background:var(--accent); color:#fff; font-size:12px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+  }
+
+  /* bottom nav */
+  .lesson-nav{max-width:920px; margin:46px auto 0; padding:0 24px; display:flex; gap:12px; justify-content:space-between; flex-wrap:wrap;}
+  .nav-btn{
+    flex:1; min-width:160px; background:var(--panel); border:1px solid var(--border); border-radius:14px;
+    padding:16px 18px; text-decoration:none; color:var(--text); display:flex; flex-direction:column; gap:4px;
+    box-shadow:0 1px 3px rgba(31,36,48,.05); transition:border-color .15s ease;
+  }
+  .nav-btn:hover{border-color:var(--accent);}
+  .nav-btn .nav-label{font-size:11.5px; color:var(--muted); font-weight:600;}
+  .nav-btn .nav-title{font-size:14px; font-weight:700;}
+  .nav-btn.next{text-align:right; align-items:flex-end;}
+  .nav-btn.disabled{opacity:.4; pointer-events:none;}
+
+  /* index page specific */
+  .lesson-card{
+    display:flex; gap:16px; align-items:center; background:var(--panel); border:1px solid var(--border);
+    border-radius:16px; padding:20px 22px; text-decoration:none; color:var(--text); margin-bottom:12px;
+    box-shadow:0 1px 3px rgba(31,36,48,.05); transition:transform .15s ease, border-color .15s ease;
+  }
+  .lesson-card:hover{transform:translateY(-2px); border-color:var(--lesson-accent, var(--violet));}
+  .lesson-card .num{
+    width:46px; height:46px; border-radius:50%; background:var(--lesson-accent, var(--violet)); color:#fff;
+    display:flex; align-items:center; justify-content:center; font-weight:700; font-size:17px; flex:none;
+  }
+  .lesson-card .info{flex:1;}
+  .lesson-card .code{font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--muted); margin-bottom:2px;}
+  .lesson-card .ltitle{font-size:16px; font-weight:700; margin-bottom:3px;}
+  .lesson-card .lsub{font-size:12.8px; color:var(--muted);}
+  .lesson-card .arrow{font-size:20px; color:var(--muted); flex:none;}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="left">
+      <a class="home-link" href="index.html">🏠 처음으로</a>
+      <span class="lesson-pill">3차시</span>
+    </div>
+    <div class="scoreboard"><span id="scoreText">0 / 0</span><span class="score-label">정답</span></div>
+  </div>
+
+  <header class="hero">
+    <div class="eyebrow">Ⅳ-2-01 · 인공지능</div>
+    <h1>인간과 인공지능의 협력</h1>
+    <p>인공지능 학습에서 데이터가 왜 중요한지 알아봐요.</p>
+  </header>
+
+  <main>
+
+    <section class="block">
+      <div class="goal-box">
+        <b>학습 목표</b>
+        <ul>
+          <li>인공지능 학습에서 데이터의 중요성을 설명할 수 있다.</li>
+          <li>인간과 인공지능의 학습을 구별할 수 있다.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="block-head"><span class="dot"></span><h2>핵심 개념</h2></div>
+      <div class="concept-grid">
+        <div class="concept-card"><h4>🧑 인간의 학습</h4><p>책이나 경험을 통해 배워요. 동물원에서 동물을 본 경험이 있으면 실제로 그 동물을 보고 구분할 수 있어요.</p></div>
+        <div class="concept-card"><h4>🤖 인공지능의 학습</h4><p>데이터로 배워요. 동물 이미지 데이터를 학습하면, 새로운 이미지가 들어와도 어떤 동물인지 구분할 수 있어요.</p></div>
+        <div class="concept-card"><h4>📊 데이터의 양</h4><p>학습에 사용하는 데이터가 많을수록 인공지능의 정확도가 높아져요. (예: 약 1,000만 개의 이미지로 학습해 고양이를 구분)</p></div>
+        <div class="concept-card"><h4>🎯 데이터의 다양한 특성과 질</h4><p>다양한 특성(사투리, 억양 등)의 데이터와 목적에 맞게 잘 가공된 질 높은 데이터일수록 더 정확하게 학습할 수 있어요.</p></div>
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="block-head"><span class="dot"></span><h2>실습 — 어떤 데이터 요소가 중요할까?</h2></div>
+      <div class="card">
+        <div class="card-label">아래 사례에서 가장 중요하게 작용한 데이터 요소를 골라보세요</div>
+        <div class="prompt-box" id="q1prompt"></div>
+        <div class="choice-list" id="q1choices"></div>
+        <button class="block" onclick="q1.check()">확인</button>
+        <div class="feedback" id="q1feedback"></div>
+        <button class="ghost" onclick="q1.next()">다음 문제 →</button>
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="block-head"><span class="dot"></span><h2>실습 — 엔트리 손동작 인식 체험하기</h2></div>
+      <div class="card">
+        <p style="font-size:13.8px; color:var(--muted); margin-top:0;"><b>엔트리</b>의 손 인식 인공지능 블록을 활용해서 '엄지 위로', '브이 사인', '사랑해' 손동작을 인식하는 프로그램을 만들어보세요. 카메라로 각 동작을 비춰보고 결과를 확인해요.</p>
+        <ol class="step-list">
+          <li>엔트리에서 '인공지능' 카테고리의 '손 인식'을 선택하고 블록 불러오기를 선택한다.</li>
+          <li>손동작의 모양을 말하는 프로그램을 작성한다.</li>
+          <li>카메라에 비춰 '엄지 위로', '브이 사인', '사랑해' 손동작을 직접 해본다.</li>
+          <li>손동작을 잘 인식했는지 결과를 확인한다.</li>
+        </ol>
+        <div class="ext-link-row">
+          <a class="ext-link" href="https://playentry.org/" target="_blank" rel="noopener">🖐️ 엔트리(playentry.org)로 이동하기</a>
+        </div>
+        <div class="card-label" style="margin-top:18px;">생각해보기</div>
+        <p style="font-size:13.5px; color:var(--muted); margin:0 0 8px;">'사랑해'를 의미하는 손동작을 비춰도 '사랑해'로 인식되지 않는다면, 그 이유는 무엇일까요?</p>
+        <textarea id="handReflect" placeholder="예: 손 인식 기능에 그 손동작이 학습되어 있지 않기 때문이다."></textarea>
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="block-head"><span class="dot"></span><h2>확인 학습</h2></div>
+      <div class="card">
+        <div class="card-label">다음 설명이 맞으면 O, 틀리면 X를 선택하세요</div>
+        <div class="prompt-box" id="q2prompt"></div>
+        <div class="ox-row" id="q2row">
+          <button type="button" class="ox-btn" data-v="O">O</button>
+          <button type="button" class="ox-btn" data-v="X">X</button>
+        </div>
+        <button class="block" onclick="q2.check()">확인</button>
+        <div class="feedback" id="q2feedback"></div>
+        <button class="ghost" onclick="q2.next()">다음 문제 →</button>
+      </div>
+    </section>
+
+  </main>
+
+  <nav class="lesson-nav"><a class="nav-btn prev" href="lesson2.html"><span class="nav-label">← 이전 차시</span><span class="nav-title">2차시 · 일반 SW vs 인공지능 SW</span></a><a class="nav-btn next" href="lesson4.html"><span class="nav-label">다음 차시 →</span><span class="nav-title">4차시 · AI 시스템으로 문제 해결</span></a></nav>
+
+<script>
+
+function $(id){return document.getElementById(id);}
+function randInt(min,max){return Math.floor(Math.random()*(max-min+1))+min;}
+function shuffle(arr){const a=arr.slice(); for(let i=a.length-1;i>0;i--){const j=randInt(0,i); [a[i],a[j]]=[a[j],a[i]];} return a;}
+function pickDifferent(arr, lastIdx){
+  if(arr.length===1) return 0;
+  let idx; do{ idx=randInt(0,arr.length-1); } while(idx===lastIdx);
+  return idx;
+}
+
+let totalCorrect=0, totalAttempts=0;
+function recordAnswer(correct){
+  totalAttempts++; if(correct) totalCorrect++;
+  $('scoreText').textContent = totalCorrect+' / '+totalAttempts;
+}
+function showFeedback(elId, correct, msg){
+  const el=$(elId);
+  el.textContent = (correct? '정답이에요! 🎉 ':'아쉬워요. ') + (msg||'');
+  el.className = 'feedback ' + (correct?'good':'bad');
+}
+
+/* ---- generic multiple-choice quiz engine ----
+   bank: [{situation, options:[string,...], answer:string, why?:string}]
+   or    [{situation, answer:string, why?:string}] with a shared optionPool
+*/
+function makeMCQuiz(cfg){
+  // cfg: {bank, promptId, choicesId, feedbackId, optionPool(optional)}
+  let idx=-1, selected=null;
+  function next(){
+    idx = pickDifferent(cfg.bank, idx);
+    const item = cfg.bank[idx];
+    $(cfg.promptId).textContent = item.situation;
+    const opts = shuffle(item.options || cfg.optionPool);
+    const wrap=$(cfg.choicesId); wrap.innerHTML='';
+    selected=null;
+    opts.forEach(o=>{
+      const btn=document.createElement('button');
+      btn.className='choice-btn'; btn.type='button'; btn.textContent=o;
+      btn.addEventListener('click', ()=>{
+        wrap.querySelectorAll('.choice-btn').forEach(b=>b.classList.remove('selected'));
+        btn.classList.add('selected'); selected=o;
+      });
+      wrap.appendChild(btn);
+    });
+    $(cfg.feedbackId).textContent=''; $(cfg.feedbackId).className='feedback';
+  }
+  function check(){
+    if(!selected){ showFeedback(cfg.feedbackId, false, '선택지를 하나 골라주세요.'); return; }
+    const item = cfg.bank[idx];
+    const correct = selected===item.answer;
+    document.querySelectorAll('#'+cfg.choicesId+' .choice-btn').forEach(b=>{
+      if(b.textContent===item.answer) b.classList.add('correct');
+      else if(b.textContent===selected && !correct) b.classList.add('wrong');
+    });
+    showFeedback(cfg.feedbackId, correct, correct ? (item.why||'') : ('정답: '+item.answer+(item.why?(' — '+item.why):'')));
+    recordAnswer(correct);
+  }
+  return {next, check};
+}
+
+/* ---- generic O/X quiz engine ----
+   bank: [{situation, answer:'O'|'X', why}]
+*/
+function makeOXQuiz(cfg){
+  let idx=-1, selected=null;
+  function next(){
+    idx = pickDifferent(cfg.bank, idx);
+    const item = cfg.bank[idx];
+    $(cfg.promptId).textContent = item.situation;
+    selected=null;
+    document.querySelectorAll('#'+cfg.rowId+' .ox-btn').forEach(b=>b.classList.remove('selected','correct','wrong'));
+    $(cfg.feedbackId).textContent=''; $(cfg.feedbackId).className='feedback';
+  }
+  function bind(){
+    document.querySelectorAll('#'+cfg.rowId+' .ox-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        document.querySelectorAll('#'+cfg.rowId+' .ox-btn').forEach(b=>b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selected = btn.dataset.v;
+      });
+    });
+  }
+  function check(){
+    if(!selected){ showFeedback(cfg.feedbackId, false, 'O 또는 X를 선택해주세요.'); return; }
+    const item = cfg.bank[idx];
+    const correct = selected===item.answer;
+    document.querySelectorAll('#'+cfg.rowId+' .ox-btn').forEach(b=>{
+      if(b.dataset.v===item.answer) b.classList.add('correct');
+      else if(b.dataset.v===selected && !correct) b.classList.add('wrong');
+    });
+    showFeedback(cfg.feedbackId, correct, item.why||'');
+    recordAnswer(correct);
+  }
+  return {next, check, bind};
+}
+
+
+const Q1_BANK=[
+  {situation:"온라인 동영상 서비스의 인공지능이 약 1,000만 개의 이미지 데이터를 학습한 후 영상 속 고양이를 스스로 구분할 수 있게 되었다.", options:["데이터의 양","데이터의 다양한 특성","데이터의 질"], answer:"데이터의 양", why:"학습에 사용된 데이터의 개수(1,000만 개)가 핵심이므로 데이터의 양이 중요한 사례예요."},
+  {situation:"스마트폰 음성 인식 인공지능이 정확한 발음뿐 아니라 소음 섞인 소리, 억양, 사투리, 말투 등 여러 특성의 데이터를 학습해서 정확하게 음성을 인식하게 되었다.", options:["데이터의 양","데이터의 다양한 특성","데이터의 질"], answer:"데이터의 다양한 특성", why:"억양, 사투리, 소음 등 다양한 특성의 데이터를 학습한 것이 핵심이에요."},
+  {situation:"자율주행 자동차가 카메라로 입력된 데이터를 사람, 자동차, 신호등, 표지판 등으로 정확히 구분하여 라벨링한 데이터로 학습해서 더 정확하게 판단하게 되었다.", options:["데이터의 양","데이터의 다양한 특성","데이터의 질"], answer:"데이터의 질", why:"목적에 맞게 잘 가공(라벨링)된 데이터, 즉 질 높은 데이터로 학습한 것이 핵심이에요."},
+  {situation:"번역 인공지능이 한 가지 지역의 말투 데이터만 학습해서 다른 지역의 말투를 잘 이해하지 못한다. 더 다양한 지역의 말투 데이터를 추가로 학습시켜야 한다.", options:["데이터의 양","데이터의 다양한 특성","데이터의 질"], answer:"데이터의 다양한 특성", why:"여러 지역의 말투처럼 다양한 특성의 데이터가 부족했던 것이 문제였어요."},
+];
+const q1 = makeMCQuiz({bank:Q1_BANK, promptId:'q1prompt', choicesId:'q1choices', feedbackId:'q1feedback'});
+
+const Q2_BANK=[
+  {situation:"인간은 책이나 경험을 통해 학습하고, 인공지능은 데이터를 통해 학습한다.", answer:"O", why:"인간의 학습과 인공지능의 학습의 핵심적인 차이예요."},
+  {situation:"인공지능은 데이터를 적게 학습할수록 더 정확한 판단을 할 수 있다.", answer:"X", why:"일반적으로 학습 데이터가 많을수록 인공지능의 정확도가 높아져요."},
+  {situation:"목적에 맞게 잘 가공된 질 높은 데이터로 학습시키면 인공지능이 더 정확하게 판단할 수 있다.", answer:"O", why:"데이터의 질이 높을수록 더 정확한 판단이 가능해요."},
+  {situation:"인공지능은 많은 데이터를 학습하면서 찾아낸 규칙에 따라 결과를 예측한다.", answer:"O", why:"인공지능은 데이터에서 규칙을 찾아내고, 그 규칙으로 새로운 상황을 예측해요."},
+  {situation:"데이터의 다양성은 인공지능 학습과 전혀 관련이 없다.", answer:"X", why:"다양한 특성의 데이터를 학습할수록 인공지능이 더 정확하게 인식할 수 있어요."},
+];
+const q2 = makeOXQuiz({bank:Q2_BANK, promptId:'q2prompt', rowId:'q2row', feedbackId:'q2feedback'});
+q2.bind();
+
+q1.next(); q2.next();
+
+</script>
+</body>
+</html>

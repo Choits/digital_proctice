@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2차시 · 일반 SW vs 인공지능 SW · 인공지능 학습지</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F5F6FB;
+    --bg-grad: radial-gradient(circle at 15% 0%, #EEF0FF 0%, #F5F6FB 45%), radial-gradient(circle at 85% 100%, #FCEEF3 0%, #F5F6FB 55%);
+    --panel:#FFFFFF;
+    --panel-alt:#F1F2F9;
+    --border:#E3E6F0;
+    --border-soft:#EBEDF5;
+    --text:#1F2430;
+    --muted:#6B7280;
+    --ink:#151A24;
+    --accent:#E2A93F;
+    --accent-dim:rgba(226,169,63,.12);
+    --violet:#6D5DFB; --violet-dim:rgba(109,93,251,.10);
+    --amber:#E2A93F; --amber-dim:rgba(226,169,63,.12);
+    --teal:#0EA895; --teal-dim:rgba(14,168,149,.10);
+    --rose:#E24F82; --rose-dim:rgba(226,79,130,.10);
+    --sky:#2F8FE0; --sky-dim:rgba(47,143,224,.10);
+    --danger:#E1483F;
+    --good:#0EA895;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg-grad); background-color:var(--bg); color:var(--text);
+    font-family:'IBM Plex Sans KR', sans-serif; line-height:1.6; padding-bottom:70px; min-height:100vh;
+  }
+  .mono{font-family:'IBM Plex Mono', monospace;}
+  a{color:inherit;}
+  img{max-width:100%;}
+
+  /* top bar */
+  .topbar{
+    position:sticky; top:0; z-index:40; background:rgba(255,255,255,.88); backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--border); padding:12px 20px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+  }
+  .topbar .left{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .home-link{
+    font-size:13px; font-weight:600; color:var(--muted); text-decoration:none; display:flex; align-items:center; gap:5px;
+    padding:6px 10px; border-radius:999px; border:1px solid var(--border); background:var(--panel);
+  }
+  .home-link:hover{color:var(--text); border-color:var(--border-soft);}
+  .lesson-pill{
+    font-family:'IBM Plex Mono', monospace; font-size:12px; font-weight:700; color:#fff;
+    background:var(--accent); padding:6px 12px; border-radius:999px;
+  }
+  .scoreboard{
+    background:var(--panel); border:1px solid var(--border); border-radius:999px;
+    padding:7px 15px; display:flex; align-items:center; gap:7px; font-size:13px; box-shadow:0 2px 8px rgba(31,36,48,.05);
+  }
+  .scoreboard #scoreText{color:var(--accent); font-weight:700; font-size:14px;}
+  .scoreboard .score-label{color:var(--muted);}
+
+  /* hero */
+  .hero{max-width:920px; margin:0 auto; padding:44px 24px 20px;}
+  .eyebrow{font-family:'IBM Plex Mono', monospace; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); font-size:12px; margin-bottom:10px;}
+  .hero h1{font-size:clamp(24px,4vw,36px); margin:0 0 10px; font-weight:700; letter-spacing:-.01em;}
+  .hero p{color:var(--muted); font-size:14.5px; max-width:640px; margin:0;}
+
+  main{max-width:920px; margin:0 auto; padding:18px 24px 10px;}
+
+  section.block{margin-bottom:34px;}
+  .block-head{display:flex; align-items:center; gap:10px; margin-bottom:14px;}
+  .block-head .dot{width:9px; height:9px; border-radius:50%; background:var(--accent); flex:none;}
+  .block-head h2{font-size:18px; margin:0;}
+
+  .goal-box{
+    background:var(--accent-dim); border:1px solid var(--border); border-left:4px solid var(--accent);
+    border-radius:12px; padding:16px 20px; margin-bottom:30px; font-size:14px;
+  }
+  .goal-box b{display:block; font-size:12.5px; color:var(--accent); margin-bottom:6px; letter-spacing:.02em;}
+  .goal-box ul{margin:0; padding-left:18px;}
+  .goal-box li{margin-bottom:3px;}
+
+  .concept-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-bottom:8px;}
+  @media (max-width:640px){.concept-grid{grid-template-columns:1fr;}}
+  .concept-card{background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:16px 18px; box-shadow:0 1px 3px rgba(31,36,48,.04);}
+  .concept-card h4{margin:0 0 6px; font-size:14px; display:flex; align-items:center; gap:7px;}
+  .concept-card p{margin:0; font-size:12.8px; color:var(--muted); line-height:1.65;}
+
+  .card{background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:22px; margin-bottom:16px; box-shadow:0 1px 3px rgba(31,36,48,.05);}
+  .card-label{font-size:13px; color:var(--muted); font-weight:600; margin-bottom:12px; letter-spacing:.01em;}
+  .prompt-box{background:var(--panel-alt); border-radius:12px; padding:16px 18px; margin-bottom:14px; font-size:14.5px; line-height:1.65;}
+
+  .choice-list{display:flex; flex-direction:column; gap:8px; margin-bottom:14px;}
+  .choice-btn{
+    text-align:left; background:var(--bg); border:1px solid var(--border); color:var(--text);
+    border-radius:10px; padding:12px 14px; font-size:14px; cursor:pointer; font-family:inherit;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .choice-btn:hover{border-color:var(--border-soft);}
+  .choice-btn.selected{border-color:var(--accent); background:var(--accent-dim);}
+  .choice-btn.correct{border-color:var(--good); background:var(--teal-dim); color:var(--good);}
+  .choice-btn.wrong{border-color:var(--danger); background:rgba(225,72,63,.08); color:var(--danger);}
+
+  button{
+    font-family:'IBM Plex Sans KR', sans-serif; font-weight:600; font-size:14px;
+    background:var(--accent); color:#fff; border:none; border-radius:10px;
+    padding:11px 18px; cursor:pointer; transition:transform .12s ease;
+  }
+  button:hover{transform:translateY(-1px);}
+  button.ghost{background:transparent; color:var(--muted); border:1px solid var(--border); margin-top:10px; width:100%;}
+  button.ghost:hover{color:var(--text); border-color:var(--border-soft);}
+  button.block{width:100%;}
+  button.outline{background:var(--panel); color:var(--accent); border:1px solid var(--accent);}
+
+  .feedback{min-height:20px; margin-top:8px; font-size:13.5px; font-weight:600;}
+  .feedback.good{color:var(--good);}
+  .feedback.bad{color:var(--danger);}
+
+  .ox-row{display:flex; gap:10px; margin-bottom:14px;}
+  .ox-btn{flex:1; padding:13px; border-radius:10px; border:1px solid var(--border); background:var(--bg); color:var(--text); font-weight:700; cursor:pointer;}
+  .ox-btn.selected{border-color:var(--accent); background:var(--accent-dim); color:var(--accent);}
+  .ox-btn.correct{border-color:var(--good); background:var(--teal-dim); color:var(--good);}
+  .ox-btn.wrong{border-color:var(--danger); background:rgba(225,72,63,.08); color:var(--danger);}
+
+  textarea{
+    width:100%; min-height:84px; background:var(--bg); border:1px solid var(--border); color:var(--text);
+    border-radius:10px; padding:12px 14px; font-family:'IBM Plex Sans KR',sans-serif; font-size:13.5px; resize:vertical;
+  }
+  input[type="text"]{
+    background:var(--bg); border:1px solid var(--border); color:var(--text);
+    border-radius:10px; padding:11px 13px; font-size:14px; font-family:inherit; outline:none; width:100%;
+  }
+  input[type="text"]:focus{border-color:var(--accent);}
+
+  .ext-link-row{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;}
+  .ext-link{
+    display:inline-flex; align-items:center; gap:7px; background:var(--panel); border:1px solid var(--border);
+    border-radius:10px; padding:10px 15px; font-size:13.5px; font-weight:600; text-decoration:none; color:var(--text);
+  }
+  .ext-link:hover{border-color:var(--accent); color:var(--accent);}
+
+  .video-wrap{position:relative; width:100%; padding-top:56.25%; border-radius:12px; overflow:hidden; background:#000; margin-bottom:10px;}
+  .video-wrap iframe{position:absolute; inset:0; width:100%; height:100%; border:0;}
+
+  .step-list{counter-reset:stepnum; margin:0 0 16px; padding:0; list-style:none;}
+  .step-list li{
+    counter-increment:stepnum; position:relative; padding:12px 14px 12px 44px; background:var(--bg);
+    border:1px solid var(--border); border-radius:10px; margin-bottom:8px; font-size:13.8px;
+  }
+  .step-list li::before{
+    content:counter(stepnum); position:absolute; left:12px; top:50%; transform:translateY(-50%);
+    width:22px; height:22px; border-radius:50%; background:var(--accent); color:#fff; font-size:12px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+  }
+
+  /* bottom nav */
+  .lesson-nav{max-width:920px; margin:46px auto 0; padding:0 24px; display:flex; gap:12px; justify-content:space-between; flex-wrap:wrap;}
+  .nav-btn{
+    flex:1; min-width:160px; background:var(--panel); border:1px solid var(--border); border-radius:14px;
+    padding:16px 18px; text-decoration:none; color:var(--text); display:flex; flex-direction:column; gap:4px;
+    box-shadow:0 1px 3px rgba(31,36,48,.05); transition:border-color .15s ease;
+  }
+  .nav-btn:hover{border-color:var(--accent);}
+  .nav-btn .nav-label{font-size:11.5px; color:var(--muted); font-weight:600;}
+  .nav-btn .nav-title{font-size:14px; font-weight:700;}
+  .nav-btn.next{text-align:right; align-items:flex-end;}
+  .nav-btn.disabled{opacity:.4; pointer-events:none;}
+
+  /* index page specific */
+  .lesson-card{
+    display:flex; gap:16px; align-items:center; background:var(--panel); border:1px solid var(--border);
+    border-radius:16px; padding:20px 22px; text-decoration:none; color:var(--text); margin-bottom:12px;
+    box-shadow:0 1px 3px rgba(31,36,48,.05); transition:transform .15s ease, border-color .15s ease;
+  }
+  .lesson-card:hover{transform:translateY(-2px); border-color:var(--lesson-accent, var(--violet));}
+  .lesson-card .num{
+    width:46px; height:46px; border-radius:50%; background:var(--lesson-accent, var(--violet)); color:#fff;
+    display:flex; align-items:center; justify-content:center; font-weight:700; font-size:17px; flex:none;
+  }
+  .lesson-card .info{flex:1;}
+  .lesson-card .code{font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--muted); margin-bottom:2px;}
+  .lesson-card .ltitle{font-size:16px; font-weight:700; margin-bottom:3px;}
+  .lesson-card .lsub{font-size:12.8px; color:var(--muted);}
+  .lesson-card .arrow{font-size:20px; color:var(--muted); flex:none;}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="left">
+      <a class="home-link" href="index.html">🏠 처음으로</a>
+      <span class="lesson-pill">2차시</span>
+    </div>
+    <div class="scoreboard"><span id="scoreText">0 / 0</span><span class="score-label">정답</span></div>
+  </div>
+
+  <header class="hero">
+    <div class="eyebrow">Ⅳ-1-02 · 인공지능</div>
+    <h1>일반 SW vs 인공지능 SW</h1>
+    <p>일반 소프트웨어와 인공지능 소프트웨어를 구별하는 연습을 해봐요.</p>
+  </header>
+
+  <main>
+
+    <section class="block">
+      <div class="goal-box">
+        <b>학습 목표</b>
+        <ul>
+          <li>일반 소프트웨어와 인공지능 소프트웨어를 구별할 수 있다.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="block-head"><span class="dot"></span><h2>핵심 개념</h2></div>
+      <div class="concept-grid">
+        <div class="concept-card"><h4>⚙️ 일반 소프트웨어</h4><p>사전에 프로그래밍 된 규칙과 알고리즘에 따라 작동해요. 예) 일반 에어컨은 사용자가 설정한 온도까지만 동작해요.</p></div>
+        <div class="concept-card"><h4>🤖 인공지능 소프트웨어</h4><p>다양한 상황에서 자율적이고 유연하게 문제를 해결해요. 예) 인공지능 에어컨은 사람 수·위치·시간대·선호도를 학습해서 온도와 바람 방향을 스스로 조절해요.</p></div>
+        <div class="concept-card"><h4>🗣️ 생활 속 AI — 스피커/챗봇</h4><p>인공지능 스피커는 음성 인식, 음악 재생, 정보 검색, 가전 제품 제어까지 가능해요. 챗봇은 대화·정보 제공·예약 서비스 등 다양한 분야에서 활용돼요.</p></div>
+        <div class="concept-card"><h4>✨ 생성형 인공지능</h4><p>텍스트, 이미지, 음성 등 다양한 콘텐츠를 스스로 만들거나 변형하는 인공지능이에요.</p></div>
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="block-head"><span class="dot"></span><h2>실습 — 나도 그릴 수 있어요! (AutoDraw 체험)</h2></div>
+      <div class="card">
+        <p style="font-size:13.8px; color:var(--muted); margin-top:0;"><b>AutoDraw</b>는 여러분이 대충 그린 그림을 인공지능이 알아보고 비슷한 전문가 그림을 추천해주는 도구예요. 일반 그림판과 비교해보며 '무엇을 그릴지 미리 말하지 않아도 인공지능이 스스로 제안한다'는 점이 왜 인공지능적인 특징인지 느껴보세요.</p>
+        <div class="ext-link-row">
+          <a class="ext-link" href="https://www.autodraw.com/" target="_blank" rel="noopener">✏️ AutoDraw 체험하러 가기</a>
+        </div>
+        <div class="card-label" style="margin-top:18px;">체험 후 공통점과 차이점을 적어보세요</div>
+        <textarea id="autodrawReflect" placeholder="예: 일반 그림판과 AutoDraw 모두 손으로 그릴 수 있다는 점은 같지만, AutoDraw는 내가 그린 모양을 보고 자동으로 비슷한 그림을 제안해준다는 점이 다르다."></textarea>
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="block-head"><span class="dot"></span><h2>실습 — 일반 SW일까, 인공지능 SW일까?</h2></div>
+      <div class="card">
+        <div class="card-label">아래 상황이 인공지능 소프트웨어가 적용된 경우이면 O, 정해진 규칙대로만 작동하는 일반 소프트웨어이면 X를 선택하세요</div>
+        <div class="prompt-box" id="q1prompt"></div>
+        <div class="ox-row" id="q1row">
+          <button type="button" class="ox-btn" data-v="O">O (인공지능 SW)</button>
+          <button type="button" class="ox-btn" data-v="X">X (일반 SW)</button>
+        </div>
+        <button class="block" onclick="q1.check()">확인</button>
+        <div class="feedback" id="q1feedback"></div>
+        <button class="ghost" onclick="q1.next()">다음 문제 →</button>
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="block-head"><span class="dot"></span><h2>확인 학습</h2></div>
+      <div class="card">
+        <div class="card-label">빈칸에 들어갈 알맞은 말을 골라보세요</div>
+        <div class="prompt-box" id="q2prompt"></div>
+        <div class="choice-list" id="q2choices"></div>
+        <button class="block" onclick="q2.check()">확인</button>
+        <div class="feedback" id="q2feedback"></div>
+        <button class="ghost" onclick="q2.next()">다음 문제 →</button>
+      </div>
+    </section>
+
+  </main>
+
+  <nav class="lesson-nav"><a class="nav-btn prev" href="lesson1.html"><span class="nav-label">← 이전 차시</span><span class="nav-title">1차시 · 인공지능의 탄생</span></a><a class="nav-btn next" href="lesson3.html"><span class="nav-label">다음 차시 →</span><span class="nav-title">3차시 · 인간과 인공지능의 협력</span></a></nav>
+
+<script>
+
+function $(id){return document.getElementById(id);}
+function randInt(min,max){return Math.floor(Math.random()*(max-min+1))+min;}
+function shuffle(arr){const a=arr.slice(); for(let i=a.length-1;i>0;i--){const j=randInt(0,i); [a[i],a[j]]=[a[j],a[i]];} return a;}
+function pickDifferent(arr, lastIdx){
+  if(arr.length===1) return 0;
+  let idx; do{ idx=randInt(0,arr.length-1); } while(idx===lastIdx);
+  return idx;
+}
+
+let totalCorrect=0, totalAttempts=0;
+function recordAnswer(correct){
+  totalAttempts++; if(correct) totalCorrect++;
+  $('scoreText').textContent = totalCorrect+' / '+totalAttempts;
+}
+function showFeedback(elId, correct, msg){
+  const el=$(elId);
+  el.textContent = (correct? '정답이에요! 🎉 ':'아쉬워요. ') + (msg||'');
+  el.className = 'feedback ' + (correct?'good':'bad');
+}
+
+/* ---- generic multiple-choice quiz engine ----
+   bank: [{situation, options:[string,...], answer:string, why?:string}]
+   or    [{situation, answer:string, why?:string}] with a shared optionPool
+*/
+function makeMCQuiz(cfg){
+  // cfg: {bank, promptId, choicesId, feedbackId, optionPool(optional)}
+  let idx=-1, selected=null;
+  function next(){
+    idx = pickDifferent(cfg.bank, idx);
+    const item = cfg.bank[idx];
+    $(cfg.promptId).textContent = item.situation;
+    const opts = shuffle(item.options || cfg.optionPool);
+    const wrap=$(cfg.choicesId); wrap.innerHTML='';
+    selected=null;
+    opts.forEach(o=>{
+      const btn=document.createElement('button');
+      btn.className='choice-btn'; btn.type='button'; btn.textContent=o;
+      btn.addEventListener('click', ()=>{
+        wrap.querySelectorAll('.choice-btn').forEach(b=>b.classList.remove('selected'));
+        btn.classList.add('selected'); selected=o;
+      });
+      wrap.appendChild(btn);
+    });
+    $(cfg.feedbackId).textContent=''; $(cfg.feedbackId).className='feedback';
+  }
+  function check(){
+    if(!selected){ showFeedback(cfg.feedbackId, false, '선택지를 하나 골라주세요.'); return; }
+    const item = cfg.bank[idx];
+    const correct = selected===item.answer;
+    document.querySelectorAll('#'+cfg.choicesId+' .choice-btn').forEach(b=>{
+      if(b.textContent===item.answer) b.classList.add('correct');
+      else if(b.textContent===selected && !correct) b.classList.add('wrong');
+    });
+    showFeedback(cfg.feedbackId, correct, correct ? (item.why||'') : ('정답: '+item.answer+(item.why?(' — '+item.why):'')));
+    recordAnswer(correct);
+  }
+  return {next, check};
+}
+
+/* ---- generic O/X quiz engine ----
+   bank: [{situation, answer:'O'|'X', why}]
+*/
+function makeOXQuiz(cfg){
+  let idx=-1, selected=null;
+  function next(){
+    idx = pickDifferent(cfg.bank, idx);
+    const item = cfg.bank[idx];
+    $(cfg.promptId).textContent = item.situation;
+    selected=null;
+    document.querySelectorAll('#'+cfg.rowId+' .ox-btn').forEach(b=>b.classList.remove('selected','correct','wrong'));
+    $(cfg.feedbackId).textContent=''; $(cfg.feedbackId).className='feedback';
+  }
+  function bind(){
+    document.querySelectorAll('#'+cfg.rowId+' .ox-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        document.querySelectorAll('#'+cfg.rowId+' .ox-btn').forEach(b=>b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selected = btn.dataset.v;
+      });
+    });
+  }
+  function check(){
+    if(!selected){ showFeedback(cfg.feedbackId, false, 'O 또는 X를 선택해주세요.'); return; }
+    const item = cfg.bank[idx];
+    const correct = selected===item.answer;
+    document.querySelectorAll('#'+cfg.rowId+' .ox-btn').forEach(b=>{
+      if(b.dataset.v===item.answer) b.classList.add('correct');
+      else if(b.dataset.v===selected && !correct) b.classList.add('wrong');
+    });
+    showFeedback(cfg.feedbackId, correct, item.why||'');
+    recordAnswer(correct);
+  }
+  return {next, check, bind};
+}
+
+
+const Q1_BANK=[
+  {situation:"얼굴을 카메라에 비추면 스마트폰 잠금이 자동으로 해제된다.", answer:"O", why:"얼굴을 인식하고 판별하는 것은 인공지능 기술이 적용된 경우예요."},
+  {situation:"화장실 수도꼭지는 미리 정해진 센서 감지 규칙에 따라 손을 가까이 대면 물이 나온다.", answer:"X", why:"정해진 규칙(손 감지 → 물 나옴)에 따라서만 작동하는 일반 소프트웨어예요."},
+  {situation:"사진 편집 앱이 사진 속 인물을 인식해 배경과 분리하고 자동으로 보정해준다.", answer:"O", why:"사진 속 내용을 스스로 인식하고 판단해서 보정하는 것은 인공지능의 특징이에요."},
+  {situation:"전자레인지는 사용자가 입력한 시간이 끝나면 정해진 대로 자동으로 꺼진다.", answer:"X", why:"입력된 시간이 끝나면 꺼지는 것은 정해진 규칙에 따른 일반 소프트웨어예요."},
+  {situation:"인공지능 스피커는 날씨, 일정, 음악 요청을 알아듣고 상황에 맞게 대답한다.", answer:"O", why:"음성을 이해하고 상황에 맞게 유연하게 반응하는 것은 인공지능 소프트웨어의 특징이에요."},
+  {situation:"엘리베이터는 버튼을 누른 층에 도착하면 정해진 규칙대로 문이 열린다.", answer:"X", why:"버튼 입력에 따라 정해진 동작만 하는 것은 일반 소프트웨어예요."},
+];
+const q1 = makeOXQuiz({bank:Q1_BANK, promptId:'q1prompt', rowId:'q1row', feedbackId:'q1feedback'});
+q1.bind();
+
+const Q2_BANK=[
+  {situation:"일반 에어컨은 사용자가 설정한 ( )까지 동작하는 정해진 규칙으로 냉방 기능을 수행한다.", options:["온도","위치","시간대","사람 수"], answer:"온도", why:"일반 에어컨은 사용자가 설정한 온도까지만 작동해요."},
+  {situation:"인공지능 에어컨은 사람의 수나 위치, 시간대, 온도 선호도 등을 ( )하여 스스로 온도와 바람 방향을 조절한다.", options:["학습","고정","삭제","무시"], answer:"학습", why:"인공지능 소프트웨어는 다양한 정보를 학습해서 자율적으로 동작해요."},
+  {situation:"텍스트, 이미지, 음성 등 콘텐츠를 스스로 만들거나 변형하는 인공지능을 ( ) 인공지능이라고 한다.", options:["생성형","일반형","고정형","규칙형"], answer:"생성형", why:"스스로 새로운 콘텐츠를 만들어내는 것이 생성형 인공지능의 핵심이에요."},
+  {situation:"사용자의 음성 인식, 음악 재생, 정보 검색, 가전 제품 제어까지 가능한 인공지능 기기는 인공지능 ( )이다.", options:["스피커","키보드","모니터","마우스"], answer:"스피커", why:"인공지능 스피커는 음성으로 다양한 기능을 제어할 수 있어요."},
+];
+const q2 = makeMCQuiz({bank:Q2_BANK, promptId:'q2prompt', choicesId:'q2choices', feedbackId:'q2feedback'});
+
+q1.next(); q2.next();
+
+</script>
+</body>
+</html>

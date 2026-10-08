@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5차시 · 인공지능 윤리 · 인공지능 학습지</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F5F6FB;
+    --bg-grad: radial-gradient(circle at 15% 0%, #EEF0FF 0%, #F5F6FB 45%), radial-gradient(circle at 85% 100%, #FCEEF3 0%, #F5F6FB 55%);
+    --panel:#FFFFFF;
+    --panel-alt:#F1F2F9;
+    --border:#E3E6F0;
+    --border-soft:#EBEDF5;
+    --text:#1F2430;
+    --muted:#6B7280;
+    --ink:#151A24;
+    --accent:#2F8FE0;
+    --accent-dim:rgba(47,143,224,.10);
+    --violet:#6D5DFB; --violet-dim:rgba(109,93,251,.10);
+    --amber:#E2A93F; --amber-dim:rgba(226,169,63,.12);
+    --teal:#0EA895; --teal-dim:rgba(14,168,149,.10);
+    --rose:#E24F82; --rose-dim:rgba(226,79,130,.10);
+    --sky:#2F8FE0; --sky-dim:rgba(47,143,224,.10);
+    --danger:#E1483F;
+    --good:#0EA895;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg-grad); background-color:var(--bg); color:var(--text);
+    font-family:'IBM Plex Sans KR', sans-serif; line-height:1.6; padding-bottom:70px; min-height:100vh;
+  }
+  .mono{font-family:'IBM Plex Mono', monospace;}
+  a{color:inherit;}
+  img{max-width:100%;}
+
+  /* top bar */
+  .topbar{
+    position:sticky; top:0; z-index:40; background:rgba(255,255,255,.88); backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--border); padding:12px 20px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+  }
+  .topbar .left{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .home-link{
+    font-size:13px; font-weight:600; color:var(--muted); text-decoration:none; display:flex; align-items:center; gap:5px;
+    padding:6px 10px; border-radius:999px; border:1px solid var(--border); background:var(--panel);
+  }
+  .home-link:hover{color:var(--text); border-color:var(--border-soft);}
+  .lesson-pill{
+    font-family:'IBM Plex Mono', monospace; font-size:12px; font-weight:700; color:#fff;
+    background:var(--accent); padding:6px 12px; border-radius:999px;
+  }
+  .scoreboard{
+    background:var(--panel); border:1px solid var(--border); border-radius:999px;
+    padding:7px 15px; display:flex; align-items:center; gap:7px; font-size:13px; box-shadow:0 2px 8px rgba(31,36,48,.05);
+  }
+  .scoreboard #scoreText{color:var(--accent); font-weight:700; font-size:14px;}
+  .scoreboard .score-label{color:var(--muted);}
+
+  /* hero */
+  .hero{max-width:920px; margin:0 auto; padding:44px 24px 20px;}
+  .eyebrow{font-family:'IBM Plex Mono', monospace; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); font-size:12px; margin-bottom:10px;}
+  .hero h1{font-size:clamp(24px,4vw,36px); margin:0 0 10px; font-weight:700; letter-spacing:-.01em;}
+  .hero p{color:var(--muted); font-size:14.5px; max-width:640px; margin:0;}
+
+  main{max-width:920px; margin:0 auto; padding:18px 24px 10px;}
+
+  section.block{margin-bottom:34px;}
+  .block-head{display:flex; align-items:center; gap:10px; margin-bottom:14px;}
+  .block-head .dot{width:9px; height:9px; border-radius:50%; background:var(--accent); flex:none;}
+  .block-head h2{font-size:18px; margin:0;}
+
+  .goal-box{
+    background:var(--accent-dim); border:1px solid var(--border); border-left:4px solid var(--accent);
+    border-radius:12px; padding:16px 20px; margin-bottom:30px; font-size:14px;
+  }
+  .goal-box b{display:block; font-size:12.5px; color:var(--accent); margin-bottom:6px; letter-spacing:.02em;}
+  .goal-box ul{margin:0; padding-left:18px;}
+  .goal-box li{margin-bottom:3px;}
+
+  .concept-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-bottom:8px;}
+  @media (max-width:640px){.concept-grid{grid-template-columns:1fr;}}
+  .concept-card{background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:16px 18px; box-shadow:0 1px 3px rgba(31,36,48,.04);}
+  .concept-card h4{margin:0 0 6px; font-size:14px; display:flex; align-items:center; gap:7px;}
+  .concept-card p{margin:0; font-size:12.8px; color:var(--muted); line-height:1.65;}
+
+  .card{background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:22px; margin-bottom:16px; box-shadow:0 1px 3px rgba(31,36,48,.05);}
+  .card-label{font-size:13px; color:var(--muted); font-weight:600; margin-bottom:12px; letter-spacing:.01em;}
+  .prompt-box{background:var(--panel-alt); border-radius:12px; padding:16px 18px; margin-bottom:14px; font-size:14.5px; line-height:1.65;}
+
+  .choice-list{display:flex; flex-direction:column; gap:8px; margin-bottom:14px;}
+  .choice-btn{
+    text-align:left; background:var(--bg); border:1px solid var(--border); color:var(--text);
+    border-radius:10px; padding:12px 14px; font-size:14px; cursor:pointer; font-family:inherit;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .choice-btn:hover{border-color:var(--border-soft);}
+  .choice-btn.selected{border-color:var(--accent); background:var(--accent-dim);}
+  .choice-btn.correct{border-color:var(--good); background:var(--teal-dim); color:var(--good);}
+  .choice-btn.wrong{border-color:var(--danger); background:rgba(225,72,63,.08); color:var(--danger);}
+
+  button{
+    font-family:'IBM Plex Sans KR', sans-serif; font-weight:600; font-size:14px;
+    background:var(--accent); color:#fff; border:none; border-radius:10px;
+    padding:11px 18px; cursor:pointer; transition:transform .12s ease;
+  }
+  button:hover{transform:translateY(-1px);}
+  button.ghost{background:transparent; color:var(--muted); border:1px solid var(--border); margin-top:10px; width:100%;}
+  button.ghost:hover{color:var(--text); border-color:var(--border-soft);}
+  button.block{width:100%;}
+  button.outline{background:var(--panel); color:var(--accent); border:1px solid var(--accent);}
+
+  .feedback{min-height:20px; margin-top:8px; font-size:13.5px; font-weight:600;}
+  .feedback.good{color:var(--good);}
+  .feedback.bad{color:var(--danger);}
+
+  .ox-row{display:flex; gap:10px; margin-bottom:14px;}
+  .ox-btn{flex:1; padding:13px; border-radius:10px; border:1px solid var(--border); background:var(--bg); color:var(--text); font-weight:700; cursor:pointer;}
+  .ox-btn.selected{border-color:var(--accent); background:var(--accent-dim); color:var(--accent);}
+  .ox-btn.correct{border-color:var(--good); background:var(--teal-dim); color:var(--good);}
+  .ox-btn.wrong{border-color:var(--danger); background:rgba(225,72,63,.08); color:var(--danger);}
+
+  textarea{
+    width:100%; min-height:84px; background:var(--bg); border:1px solid var(--border); color:var(--text);
+    border-radius:10px; padding:12px 14px; font-family:'IBM Plex Sans KR',sans-serif; font-size:13.5px; resize:vertical;
+  }
+  input[type="text"]{
+    background:var(--bg); border:1px solid var(--border); color:var(--text);
+    border-radius:10px; padding:11px 13px; font-size:14px; font-family:inherit; outline:none; width:100%;
+  }
+  input[type="text"]:focus{border-color:var(--accent);}
+
+  .ext-link-row{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;}
+  .ext-link{
+    display:inline-flex; align-items:center; gap:7px; background:var(--panel); border:1px solid var(--border);
+    border-radius:10px; padding:10px 15px; font-size:13.5px; font-weight:600; text-decoration:none; color:var(--text);
+  }
+  .ext-link:hover{border-color:var(--accent); color:var(--accent);}
+
+  .video-wrap{position:relative; width:100%; padding-top:56.25%; border-radius:12px; overflow:hidden; background:#000; margin-bottom:10px;}
+  .video-wrap iframe{position:absolute; inset:0; width:100%; height:100%; border:0;}
+
+  .step-list{counter-reset:stepnum; margin:0 0 16px; padding:0; list-style:none;}
+  .step-list li{
+    counter-increment:stepnum; position:relative; padding:12px 14px 12px 44px; background:var(--bg);
+    border:1px solid var(--border); border-radius:10px; margin-bottom:8px; font-size:13.8px;
+  }
+  .step-list li::before{
+    content:counter(stepnum); position:absolute; left:12px; top:50%; transform:translateY(-50%);
+    width:22px; height:22px; border-radius:50%; background:var(--accent); color:#fff; font-size:12px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+  }
+
+  /* bottom nav */
+  .lesson-nav{max-width:920px; margin:46px auto 0; padding:0 24px; display:flex; gap:12px; justify-content:space-between; flex-wrap:wrap;}
+  .nav-btn{
+    flex:1; min-width:160px; background:var(--panel); border:1px solid var(--border); border-radius:14px;
+    padding:16px 18px; text-decoration:none; color:var(--text); display:flex; flex-direction:column; gap:4px;
+    box-shadow:0 1px 3px rgba(31,36,48,.05); transition:border-color .15s ease;
+  }
+  .nav-btn:hover{border-color:var(--accent);}
+  .nav-btn .nav-label{font-size:11.5px; color:var(--muted); font-weight:600;}
+  .nav-btn .nav-title{font-size:14px; font-weight:700;}
+  .nav-btn.next{text-align:right; align-items:flex-end;}
+  .nav-btn.disabled{opacity:.4; pointer-events:none;}
+
+  /* index page specific */
+  .lesson-card{
+    display:flex; gap:16px; align-items:center; background:var(--panel); border:1px solid var(--border);
+    border-radius:16px; padding:20px 22px; text-decoration:none; color:var(--text); margin-bottom:12px;
+    box-shadow:0 1px 3px rgba(31,36,48,.05); transition:transform .15s ease, border-color .15s ease;
+  }
+  .lesson-card:hover{transform:translateY(-2px); border-color:var(--lesson-accent, var(--violet));}
+  .lesson-card .num{
+    width:46px; height:46px; border-radius:50%; background:var(--lesson-accent, var(--violet)); color:#fff;
+    display:flex; align-items:center; justify-content:center; font-weight:700; font-size:17px; flex:none;
+  }
+  .lesson-card .info{flex:1;}
+  .lesson-card .code{font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--muted); margin-bottom:2px;}
+  .lesson-card .ltitle{font-size:16px; font-weight:700; margin-bottom:3px;}
+  .lesson-card .lsub{font-size:12.8px; color:var(--muted);}
+  .lesson-card .arrow{font-size:20px; color:var(--muted); flex:none;}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="left">
+      <a class="home-link" href="index.html">🏠 처음으로</a>
+      <span class="lesson-pill">5차시</span>
+    </div>
+    <div class="scoreboard"><span id="scoreText">0 / 0</span><span class="score-label">정답</span></div>
+  </div>
+
+  <header class="hero">
+    <div class="eyebrow">Ⅳ-2-03 · 인공지능</div>
+    <h1>인공지능 윤리</h1>
+    <p>데이터 편향과 인공지능 윤리 문제를 생각해봐요.</p>
+  </header>
+
+  <main>
+
+    <section class="block">
+      <div class="goal-box">
+        <b>학습 목표</b>
+        <ul>
+          <li>인공지능 학습에 필요한 데이터의 수집과 활용에서 발생하는 문제를 탐색할 수 있다.</li>
+          <li>데이터의 올바른 활용의 중요성을 설명할 수 있다.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="block-head"><span class="dot"></span><h2>핵심 개념</h2></div>
+      <div class="concept-grid">
+        <div class="concept-card"><h4>🔒 사생활 침해</h4><p>데이터를 수집하는 과정에서 개인의 정보, 활동, 신원 등을 제어할 권리인 '사생활'이 침해될 수 있어요. (예: 인공지능 스피커에 녹음된 사적인 대화 유출)</p></div>
+        <div class="concept-card"><h4>⚖️ 학습 데이터 편향</h4><p>학습 데이터가 한쪽으로 치우쳐 수집되면 편향된 결과가 나와요. (예: 남성 지원자 데이터가 훨씬 많아 여성을 차별한 채용 인공지능)</p></div>
+        <div class="concept-card"><h4>🕰️ 데이터 축적 편향</h4><p>오래된 과거 데이터가 쌓이면서 시대적 편견이나 차별이 그대로 반영될 수 있어요. (예: 성별·인종 편견이 반영된 이미지 생성 결과)</p></div>
+        <div class="concept-card"><h4>📜 인공지능 윤리 원칙</h4><p>3대 기본 원칙: 인간의 존엄성 · 사회의 공공선 · 기술의 합목적성. 10대 핵심 요건: 인권 보장, 프라이버시 보호, 다양성 존중, 침해 금지, 공공성, 연대성, 데이터 관리, 책임성, 안전성, 투명성.</p></div>
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="block-head"><span class="dot"></span><h2>실습 — 어떤 윤리 문제일까?</h2></div>
+      <div class="card">
+        <div class="card-label">아래 사례가 어떤 윤리적 문제에 해당하는지 골라보세요</div>
+        <div class="prompt-box" id="q1prompt"></div>
+        <div class="choice-list" id="q1choices"></div>
+        <button class="block" onclick="q1.check()">확인</button>
+        <div class="feedback" id="q1feedback"></div>
+        <button class="ghost" onclick="q1.next()">다음 문제 →</button>
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="block-head"><span class="dot"></span><h2>토론 활동 — 챗봇의 두 얼굴</h2></div>
+      <div class="card">
+        <p style="font-size:13.8px; color:var(--muted); margin-top:0;">인공지능 챗봇이 공익 목적으로 이용자의 개인 정보를 수집해야 하는 상황이 생긴다면, 이는 괜찮은 것일까요, 아니면 사생활 침해일까요? 찬성과 반대 입장에서 근거를 각각 적어보고, 나의 최종 의견과 해결 방안을 정리해보세요.</p>
+        <div class="concept-grid">
+          <div class="concept-card">
+            <h4>🙆 찬성 근거</h4>
+            <textarea id="debatePro" placeholder="예: 의료 분야에서 환자 건강 상태를 파악해 서비스를 제공하려는 목적이라면 공익을 위한 것으로 볼 수 있다."></textarea>
+          </div>
+          <div class="concept-card">
+            <h4>🙅 반대 근거</h4>
+            <textarea id="debateCon" placeholder="예: 공익 목적이라도 수집된 정보가 무분별하게 활용되면 사생활 침해로 이어질 수 있다."></textarea>
+          </div>
+        </div>
+        <div class="card-label" style="margin-top:14px;">나의 의견과 해결 방안</div>
+        <textarea id="debateConclusion" placeholder="예: 사용자의 동의를 받고, 꼭 필요한 최소한의 정보만 수집하며 안전하게 보호해야 한다."></textarea>
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="block-head"><span class="dot"></span><h2>확인 학습</h2></div>
+      <div class="card">
+        <div class="card-label">다음 설명이 맞으면 O, 틀리면 X를 선택하세요</div>
+        <div class="prompt-box" id="q2prompt"></div>
+        <div class="ox-row" id="q2row">
+          <button type="button" class="ox-btn" data-v="O">O</button>
+          <button type="button" class="ox-btn" data-v="X">X</button>
+        </div>
+        <button class="block" onclick="q2.check()">확인</button>
+        <div class="feedback" id="q2feedback"></div>
+        <button class="ghost" onclick="q2.next()">다음 문제 →</button>
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="block-head"><span class="dot"></span><h2>참고 영상</h2></div>
+      <div class="card">
+        <div class="card-label">[핫클립] 인공지능 윤리적 이슈 사례 / YTN 사이언스</div>
+        <div class="video-wrap"><iframe src="https://www.youtube.com/embed/LlDAYy34dKY" title="인공지능 윤리적 이슈 사례" allowfullscreen></iframe></div>
+        <div class="ext-link-row">
+          <a class="ext-link" href="https://www.youtube.com/watch?v=LlDAYy34dKY" target="_blank" rel="noopener">▶ 유튜브에서 보기</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="block-head"><span class="dot"></span><h2>단원을 마치며</h2></div>
+      <div class="card" style="text-align:center;">
+        <p style="font-size:14px; color:var(--muted); margin:0 0 16px;">5개 차시를 모두 완료했어요! 수고 많았습니다. 🎉</p>
+        <a href="index.html"><button class="block">🏠 처음으로 돌아가기</button></a>
+      </div>
+    </section>
+
+  </main>
+
+  <nav class="lesson-nav"><a class="nav-btn prev" href="lesson4.html"><span class="nav-label">← 이전 차시</span><span class="nav-title">4차시 · AI 시스템으로 문제 해결</span></a><a class="nav-btn next" href="index.html"><span class="nav-label">마지막 차시입니다</span><span class="nav-title">처음으로 돌아가기 →</span></a></nav>
+
+<script>
+
+function $(id){return document.getElementById(id);}
+function randInt(min,max){return Math.floor(Math.random()*(max-min+1))+min;}
+function shuffle(arr){const a=arr.slice(); for(let i=a.length-1;i>0;i--){const j=randInt(0,i); [a[i],a[j]]=[a[j],a[i]];} return a;}
+function pickDifferent(arr, lastIdx){
+  if(arr.length===1) return 0;
+  let idx; do{ idx=randInt(0,arr.length-1); } while(idx===lastIdx);
+  return idx;
+}
+
+let totalCorrect=0, totalAttempts=0;
+function recordAnswer(correct){
+  totalAttempts++; if(correct) totalCorrect++;
+  $('scoreText').textContent = totalCorrect+' / '+totalAttempts;
+}
+function showFeedback(elId, correct, msg){
+  const el=$(elId);
+  el.textContent = (correct? '정답이에요! 🎉 ':'아쉬워요. ') + (msg||'');
+  el.className = 'feedback ' + (correct?'good':'bad');
+}
+
+/* ---- generic multiple-choice quiz engine ----
+   bank: [{situation, options:[string,...], answer:string, why?:string}]
+   or    [{situation, answer:string, why?:string}] with a shared optionPool
+*/
+function makeMCQuiz(cfg){
+  // cfg: {bank, promptId, choicesId, feedbackId, optionPool(optional)}
+  let idx=-1, selected=null;
+  function next(){
+    idx = pickDifferent(cfg.bank, idx);
+    const item = cfg.bank[idx];
+    $(cfg.promptId).textContent = item.situation;
+    const opts = shuffle(item.options || cfg.optionPool);
+    const wrap=$(cfg.choicesId); wrap.innerHTML='';
+    selected=null;
+    opts.forEach(o=>{
+      const btn=document.createElement('button');
+      btn.className='choice-btn'; btn.type='button'; btn.textContent=o;
+      btn.addEventListener('click', ()=>{
+        wrap.querySelectorAll('.choice-btn').forEach(b=>b.classList.remove('selected'));
+        btn.classList.add('selected'); selected=o;
+      });
+      wrap.appendChild(btn);
+    });
+    $(cfg.feedbackId).textContent=''; $(cfg.feedbackId).className='feedback';
+  }
+  function check(){
+    if(!selected){ showFeedback(cfg.feedbackId, false, '선택지를 하나 골라주세요.'); return; }
+    const item = cfg.bank[idx];
+    const correct = selected===item.answer;
+    document.querySelectorAll('#'+cfg.choicesId+' .choice-btn').forEach(b=>{
+      if(b.textContent===item.answer) b.classList.add('correct');
+      else if(b.textContent===selected && !correct) b.classList.add('wrong');
+    });
+    showFeedback(cfg.feedbackId, correct, correct ? (item.why||'') : ('정답: '+item.answer+(item.why?(' — '+item.why):'')));
+    recordAnswer(correct);
+  }
+  return {next, check};
+}
+
+/* ---- generic O/X quiz engine ----
+   bank: [{situation, answer:'O'|'X', why}]
+*/
+function makeOXQuiz(cfg){
+  let idx=-1, selected=null;
+  function next(){
+    idx = pickDifferent(cfg.bank, idx);
+    const item = cfg.bank[idx];
+    $(cfg.promptId).textContent = item.situation;
+    selected=null;
+    document.querySelectorAll('#'+cfg.rowId+' .ox-btn').forEach(b=>b.classList.remove('selected','correct','wrong'));
+    $(cfg.feedbackId).textContent=''; $(cfg.feedbackId).className='feedback';
+  }
+  function bind(){
+    document.querySelectorAll('#'+cfg.rowId+' .ox-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        document.querySelectorAll('#'+cfg.rowId+' .ox-btn').forEach(b=>b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selected = btn.dataset.v;
+      });
+    });
+  }
+  function check(){
+    if(!selected){ showFeedback(cfg.feedbackId, false, 'O 또는 X를 선택해주세요.'); return; }
+    const item = cfg.bank[idx];
+    const correct = selected===item.answer;
+    document.querySelectorAll('#'+cfg.rowId+' .ox-btn').forEach(b=>{
+      if(b.dataset.v===item.answer) b.classList.add('correct');
+      else if(b.dataset.v===selected && !correct) b.classList.add('wrong');
+    });
+    showFeedback(cfg.feedbackId, correct, item.why||'');
+    recordAnswer(correct);
+  }
+  return {next, check, bind};
+}
+
+
+const Q1_BANK=[
+  {situation:"인공지능 스피커로 녹음된 사적인 대화가 연락처에 저장된 사람들에게 그대로 공유되었다.", options:["사생활 침해","학습 데이터 편향","데이터 축적 편향"], answer:"사생활 침해", why:"개인의 사적인 대화가 동의 없이 유출된 것은 사생활 침해 사례예요."},
+  {situation:"한 기업의 인공지능 채용 시스템을 학습시킨 지원서가 남성 지원자 것이 압도적으로 많아서, 여성보다 남성 지원자를 선호하는 결과가 나왔다.", options:["사생활 침해","학습 데이터 편향","데이터 축적 편향"], answer:"학습 데이터 편향", why:"학습에 사용한 데이터 자체가 한쪽으로 치우쳐 수집되어 생긴 편향이에요."},
+  {situation:"오래전 판결 데이터를 그대로 학습한 범죄 예측 인공지능이 과거의 차별적인 판단 경향을 그대로 반영해서 특정 인종에게 불리한 예측을 했다.", options:["사생활 침해","학습 데이터 편향","데이터 축적 편향"], answer:"데이터 축적 편향", why:"오랫동안 쌓인 과거 데이터에 담긴 시대적 차별이 그대로 반영된 경우예요."},
+  {situation:"위치 추적 애플리케이션이 사용자의 동의 없이 이동 경로를 수집해서 외부 업체에 판매했다.", options:["사생활 침해","학습 데이터 편향","데이터 축적 편향"], answer:"사생활 침해", why:"동의 없이 개인의 활동 정보를 수집하고 활용한 것은 사생활 침해예요."},
+  {situation:"이미지 생성형 인공지능에 '건축가'를 입력하면 남성 이미지가, '승무원'을 입력하면 여성 이미지가 주로 나타났다.", options:["사생활 침해","학습 데이터 편향","데이터 축적 편향"], answer:"데이터 축적 편향", why:"오랜 기간 쌓인 데이터 속 성별 고정관념이 그대로 학습되어 반영된 경우예요."},
+];
+const q1 = makeMCQuiz({bank:Q1_BANK, promptId:'q1prompt', choicesId:'q1choices', feedbackId:'q1feedback'});
+
+const Q2_BANK=[
+  {situation:"인공지능 윤리의 3대 기본 원칙은 인간의 존엄성, 사회의 공공선, 기술의 합목적성이다.", answer:"O", why:"정부가 제시한 사람 중심 인공지능 윤리 기준의 3대 기본 원칙이에요."},
+  {situation:"학습 데이터가 한쪽으로 치우쳐 수집되어도 인공지능 결과에는 영향을 주지 않는다.", answer:"X", why:"데이터가 편향되면 인공지능의 판단 결과도 편향될 수 있어요."},
+  {situation:"개발자는 사용자의 사생활을 보호하는 기능을 개발할 책임이 있다.", answer:"O", why:"개발자는 포용적인 인공지능과 사생활 보호 기능을 개발할 책임이 있어요."},
+  {situation:"공익 목적이라면 사용자의 동의 없이도 개인 정보를 자유롭게 수집해도 괜찮다.", answer:"X", why:"공익 목적이라도 사용자의 동의와 최소한의 정보 수집 원칙을 지켜야 해요."},
+  {situation:"인공지능 윤리의 10대 핵심 요건에는 '투명성'과 '책임성'이 포함된다.", answer:"O", why:"10대 핵심 요건에는 인권 보장, 프라이버시 보호, 다양성 존중, 침해 금지, 공공성, 연대성, 데이터 관리, 책임성, 안전성, 투명성이 있어요."},
+];
+const q2 = makeOXQuiz({bank:Q2_BANK, promptId:'q2prompt', rowId:'q2row', feedbackId:'q2feedback'});
+q2.bind();
+
+q1.next(); q2.next();
+
+</script>
+</body>
+</html>
